@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand colors */
+  --color-gold: #a76d1f;
+  --color-caramel: #cf9051;
+  --color-tan: #c79c71;
+  --color-cream: #faf6f1;
+  --color-brown: #603d0e;
+  --color-dark: #1c1c1c;
+  --color-camel: #be905a;
+  --color-offWhite: #fbf9f6;
+  --color-cream-light: #fff0e1;
+  --color-coffeeBrown: #6f5026;
+  --color-footer: #7a5533;
+
+  /* Gradients */
+  --background-image-hero-fade: linear-gradient(
+    to bottom,
+    #faf6f1 20%,
+    #faf6f1cc 45%,
+    #faf6f133 70%,
+    transparent 100%
+  );
+  --background-image-border-gold: linear-gradient(to bottom, #ccae74, #9b7936);
+}
+
+@layer utilities {
+  .bg-hero-fade {
+    background-image: var(--background-image-hero-fade);
+  }
+}
+
+@layer base {
+  body {
+    font-family: "Inter", sans-serif;
+    background-color: theme(--color-cream);
+    color: theme(--color-dark);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Times New Roman", Times, serif;
+  }
+}
+
+.font-lato {
+  font-family: "Lato", sans-serif;
+}
+
+.font-inter {
+  font-family: "Inter", sans-serif;
+}
+
+.font-times {
+  font-family: "Times New Roman", Times, serif;
+}
