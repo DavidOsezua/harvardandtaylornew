@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ProgressiveImage from "../ProgressiveImage";
 
 interface PropertyDetail {
   images: string[];
@@ -101,11 +102,11 @@ const PropertyDetailHero = ({ property }: PropertyDetailHeroProps) => {
           <div className="relative md:w-[52%] shrink-0 h-72 md:h-auto min-h-[360px] overflow-hidden">
             {/* Images */}
             {property.images.map((src, i) => (
-              <img
+              <ProgressiveImage
                 key={src}
                 src={src}
                 alt={`${property.address} – image ${i + 1}`}
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-400 ${
+                className={`absolute inset-0 transition-opacity duration-400 ${
                   i === currentImg ? "opacity-100" : "opacity-0"
                 }`}
               />

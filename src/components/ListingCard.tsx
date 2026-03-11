@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import ProgressiveImage from "./ProgressiveImage";
 
 export interface Listing {
   id: string;
@@ -71,10 +72,11 @@ const ListingCard = ({ listing }: { listing: Listing }) => {
     >
       {/* Image */}
       <div className="relative h-70 overflow-hidden">
-        <img
+        <ProgressiveImage
           src={listing.image}
           alt={listing.address}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full"
+          imgClassName="group-hover:scale-105 transition-transform duration-500"
         />
         {/* Badge */}
         <span

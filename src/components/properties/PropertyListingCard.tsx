@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import ProgressiveImage from "../ProgressiveImage";
 
 export interface PropertyListing {
   id: string;
@@ -64,10 +65,10 @@ const PropertyListingCard = ({ listing }: { listing: PropertyListing }) => {
 
       {/* ── Image ── */}
       <div className="relative md:w-[45%] shrink-0 h-60 md:h-full overflow-hidden">
-        <img
+        <ProgressiveImage
           src={listing.image}
           alt={listing.address}
-          className="w-full h-full object-cover"
+          className="w-full h-full"
         />
         <span
           className={`absolute top-3 left-3 px-2.5 py-1 text-[9px] font-medium tracking-widest uppercase rounded-sm ${statusBadgeClass[listing.status]}`}
