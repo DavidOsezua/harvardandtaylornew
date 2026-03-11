@@ -4,7 +4,10 @@ const ServicesPage = () => {
   return (
     <main>
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden" style={{ minHeight: "480px" }}>
+      <section
+        className="relative overflow-hidden"
+        style={{ minHeight: "480px" }}
+      >
         {/* Background building image */}
         <div
           className="absolute inset-0"
@@ -58,12 +61,8 @@ const ServicesPage = () => {
       {/* ── Service Cards ── */}
       <section className="bg-cream py-12 px-6 md:px-10">
         <div className="max-w-6xl mx-auto flex flex-col gap-5">
-
           {/* Large top card */}
-          <div
-            className="relative overflow-hidden rounded-lg"
-            style={{ minHeight: "280px" }}
-          >
+          <div className="relative overflow-hidden rounded-lg min-h-[280px]">
             <div
               className="absolute inset-0"
               style={{
@@ -91,16 +90,16 @@ const ServicesPage = () => {
                 className="text-white/75 text-[13px] font-light leading-relaxed max-w-xl"
                 style={{ fontFamily: "'Inter', sans-serif" }}
               >
-                Comprehensive management solutions, from marketing and tenant sourcing to
-                rent collection, compliance and ongoing property care, ensuring your
-                investment is protected and performing at its best.
+                Comprehensive management solutions, from marketing and tenant
+                sourcing to rent collection, compliance and ongoing property
+                care, ensuring your investment is protected and performing at
+                its best.
               </p>
             </div>
           </div>
 
           {/* Two smaller cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
             {/* Landlord Advice */}
             <Link
               to="/services/landlord-advice"
@@ -132,9 +131,9 @@ const ServicesPage = () => {
                   className="text-white/75 text-[13px] font-light leading-relaxed"
                   style={{ fontFamily: "'Inter', sans-serif" }}
                 >
-                  Practical guidance on regulations, market positioning and long-term
-                  strategy, helping you make informed decisions with clarity and
-                  confidence in London's evolving rental market.
+                  Practical guidance on regulations, market positioning and
+                  long-term strategy, helping you make informed decisions with
+                  clarity and confidence in London's evolving rental market.
                 </p>
               </div>
             </Link>
@@ -172,13 +171,12 @@ const ServicesPage = () => {
                   className="text-white/75 text-[13px] font-light leading-relaxed"
                   style={{ fontFamily: "'Inter', sans-serif" }}
                 >
-                  Clear step-by-step support, from property search to move-in, outlining
-                  requirements, processes and expectations to make renting
-                  straightforward and stress-free.
+                  Clear step-by-step support, from property search to move-in,
+                  outlining requirements, processes and expectations to make
+                  renting straightforward and stress-free.
                 </p>
               </div>
             </Link>
-
           </div>
         </div>
       </section>
