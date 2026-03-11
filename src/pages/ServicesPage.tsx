@@ -9,7 +9,7 @@ const ServicesPage = () => {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: "url('/images/serviceHero.png')",
+            backgroundImage: "url('/images/serviceHero.webp')",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
@@ -67,7 +67,7 @@ const ServicesPage = () => {
             <div
               className="absolute inset-0"
               style={{
-                backgroundImage: "url('/images/premium-banner.png')",
+                backgroundImage: "url('/images/service.webp')",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }}
@@ -110,7 +110,7 @@ const ServicesPage = () => {
               <div
                 className="absolute inset-0"
                 style={{
-                  backgroundImage: "url('/howWeWorkLeft.png')",
+                  backgroundImage: "url('/images/LandlordAdvice.webp')",
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                 }}
@@ -148,7 +148,7 @@ const ServicesPage = () => {
               <div
                 className="absolute inset-0"
                 style={{
-                  backgroundImage: "url('/howWeWorkRight.png')",
+                  backgroundImage: "url('/images/tenantAdvice.webp')",
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                 }}

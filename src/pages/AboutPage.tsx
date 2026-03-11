@@ -6,7 +6,7 @@ const AboutPage = () => {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: "url('/hero-bg.png')",
+            backgroundImage: "url('/images/aboutUsHero.webp')",
             backgroundSize: "cover",
             backgroundPosition: "center top",
           }}
@@ -49,7 +49,7 @@ const AboutPage = () => {
           {/* Portrait */}
           <div className="w-full max-w-[500px] overflow-hidden rounded-sm">
             <img
-              src="/images/team.png"
+              src="/images/team.webp"
               alt="The Principal – Managing Director"
               className="w-full h-auto object-cover"
             />

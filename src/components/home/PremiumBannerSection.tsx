@@ -6,7 +6,7 @@ const PremiumBannerSection = () => {
       {/* Background image — add /premium-banner.jpg to public/ */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/images/premium-banner.png')" }}
+        style={{ backgroundImage: "url('/images/premium-banner.webp')" }}
       />
 
       {/* Dark overlay */}

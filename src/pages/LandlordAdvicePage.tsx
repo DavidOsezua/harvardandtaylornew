@@ -19,7 +19,7 @@ const LandlordAdvicePage = () => {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: "url('/images/serviceHero.png')",
+            backgroundImage: "url('/images/LandlordAdvice.webp')",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
@@ -274,7 +274,7 @@ const LandlordAdvicePage = () => {
           {/* Right — image */}
           <div className="overflow-hidden rounded-sm h-[420px]">
             <img
-              src="/listings/listings2.jpg"
+              src="/listings/listings2.webp"
               alt="Interior"
               className="w-full h-full object-cover"
             />

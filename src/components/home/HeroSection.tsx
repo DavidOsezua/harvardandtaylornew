@@ -4,13 +4,13 @@ const HeroSection = () => {
       {/* Desktop background image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat hidden md:block"
-        style={{ backgroundImage: "url('/hero-bg.png')" }}
+        style={{ backgroundImage: "url('/hero-bg.webp')" }}
       />
 
       {/* Mobile background image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat md:hidden"
-        style={{ backgroundImage: "url('/mobileHeroImg.png')" }}
+        style={{ backgroundImage: "url('/mobileHeroImg.webp')" }}
       />
 
       {/* Gradient overlay */}

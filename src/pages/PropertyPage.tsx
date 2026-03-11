@@ -8,7 +8,7 @@ import type { Filters } from "../components/properties/PropertyHeroSection";
 const sliderListings: PropertyListing[] = [
   {
     id: "s1",
-    image: "/listings/listings1.jpg",
+    image: "/listings/listings1.webp",
     status: "LET AGREED",
     available: true,
     address: "Belmont Close, London, SW4",
@@ -20,7 +20,7 @@ const sliderListings: PropertyListing[] = [
   },
   {
     id: "s2",
-    image: "/listings/listings2.jpg",
+    image: "/listings/listings2.webp",
     status: "FOR SALE",
     available: true,
     address: "Old Brompton Road, London, SW5",
@@ -32,7 +32,7 @@ const sliderListings: PropertyListing[] = [
   },
   {
     id: "s3",
-    image: "/listings/listings3.jpg",
+    image: "/listings/listings3.webp",
     status: "AVAILABLE",
     available: true,
     address: "Belmont Close, London, SW4",
@@ -48,7 +48,7 @@ const sliderListings: PropertyListing[] = [
 const topGridListings: Listing[] = [
   {
     id: "t1",
-    image: "/listings/listings1.jpg",
+    image: "/listings/listings1.webp",
     badge: "FOR LET",
     address: "Belmont Close, London, SW4",
     beds: 3,
@@ -60,7 +60,7 @@ const topGridListings: Listing[] = [
   },
   {
     id: "t2",
-    image: "/listings/listings2.jpg",
+    image: "/listings/listings2.webp",
     badge: "FOR SALE",
     address: "Old Brompton Road, London, SW5",
     beds: 3,
@@ -72,7 +72,7 @@ const topGridListings: Listing[] = [
   },
   {
     id: "t3",
-    image: "/listings/listings3.jpg",
+    image: "/listings/listings3.webp",
     badge: "FOR LET",
     address: "Belmont Close, London, SW4",
     beds: 3,
@@ -88,7 +88,7 @@ const topGridListings: Listing[] = [
 const bottomGridListings: Listing[] = [
   {
     id: "b1",
-    image: "/listings/listings3.jpg",
+    image: "/listings/listings3.webp",
     badge: "FOR LET",
     address: "Clapham Manor Street, London, SW4",
     beds: 2,
@@ -100,7 +100,7 @@ const bottomGridListings: Listing[] = [
   },
   {
     id: "b2",
-    image: "/listings/listings1.jpg",
+    image: "/listings/listings1.webp",
     badge: "FOR SALE",
     address: "Landor Road, London, SW9",
     beds: 4,
@@ -112,7 +112,7 @@ const bottomGridListings: Listing[] = [
   },
   {
     id: "b3",
-    image: "/listings/listings2.jpg",
+    image: "/listings/listings2.webp",
     badge: "FOR LET",
     address: "Acre Lane, Brixton, SW2",
     beds: 1,

@@ -6,7 +6,7 @@ const TenantAdvicePage = () => {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: "url('/images/serviceHero.png')",
+            backgroundImage: "url('/images/tenantAdvice.webp')",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
@@ -244,7 +244,7 @@ const TenantAdvicePage = () => {
           {/* Right — image */}
           <div className="overflow-hidden rounded-sm h-[460px]">
             <img
-              src="/listings/listings1.jpg"
+              src="/listings/listings1.webp"
               alt="Interior"
               className="w-full h-full object-cover"
             />

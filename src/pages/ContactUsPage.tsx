@@ -39,7 +39,7 @@ const ContactUsPage = () => {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: "url('/hero-bg.png')",
+            backgroundImage: "url('/images/contactUsHeroDesktop.webp')",
             backgroundSize: "cover",
             backgroundPosition: "center top",
           }}
@@ -219,7 +219,7 @@ const ContactUsPage = () => {
             <div
               className="absolute inset-0"
               style={{
-                backgroundImage: "url('/howWeWorkLeft.png')",
+                backgroundImage: "url('/howWeWorkLeft.webp')",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }}

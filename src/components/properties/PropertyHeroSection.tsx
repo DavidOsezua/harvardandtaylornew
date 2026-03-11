@@ -37,18 +37,21 @@ const FilterSelect = ({
   placeholder: string;
   options: { label: string; value: string }[];
 }) => (
-  <div className="flex flex-col gap-1.5 flex-1 min-w-[130px] px-4 py-3">
+  <div className="flex flex-col gap-1.5 flex-1 min-w-0">
     <label
-      className="text-[10px] tracking-widest uppercase text-dark/50 whitespace-nowrap"
+      className="text-[11px] text-dark/60 whitespace-nowrap"
       style={{ fontFamily: "'Lato', sans-serif" }}
     >
       {label}
     </label>
-    <div className="relative flex items-center">
+    <div
+      className="relative flex items-center rounded-lg px-4 py-3"
+      style={{ border: "1px solid #e0d8cc", backgroundColor: "#f7f3ee" }}
+    >
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-transparent text-dark/60 text-[12px] font-light appearance-none outline-none cursor-pointer pr-5 leading-none"
+        className="w-full bg-transparent text-dark/70 text-[13px] appearance-none outline-none cursor-pointer pr-6 leading-none"
         style={{ fontFamily: "'Inter', sans-serif" }}
       >
         <option value="">{placeholder}</option>
@@ -58,7 +61,7 @@ const FilterSelect = ({
           </option>
         ))}
       </select>
-      <span className="absolute right-0 pointer-events-none text-dark/40">
+      <span className="absolute right-3 pointer-events-none text-dark/40">
         <ChevronIcon />
       </span>
     </div>
@@ -107,13 +110,13 @@ const PropertyHeroSection = ({ onSearch }: PropertyHeroSectionProps) => {
       <div
         className="absolute inset-0"
         style={{
-          backgroundImage: "url('/images/premium-banner.png')",
+          backgroundImage: "url('/images/premium-banner.webp')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
       />
       {/* Cream overlay — fades from solid at top to transparent at bottom */}
-      <div className="absolute inset-0 bg-linear-to-b from-cream/95 via-cream/80 to-cream/30" />
+      <div className="absolute inset-0 bg-linear-to-b from-cream via-cream to-cream/50" />
 
       {/* Content */}
       <div className="relative max-w-4xl mx-auto px-6 pt-14 pb-20 text-center">
@@ -134,7 +137,7 @@ const PropertyHeroSection = ({ onSearch }: PropertyHeroSectionProps) => {
             fontWeight: 400,
           }}
         >
-          🏠 Our Properties
+          Our Properties
         </h1>
 
         {/* Subtitle */}
@@ -147,21 +150,24 @@ const PropertyHeroSection = ({ onSearch }: PropertyHeroSectionProps) => {
         </p>
 
         {/* ── Filter bar ── */}
-        <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-sm border border-dark/8 flex items-stretch overflow-hidden">
-          {/* Filter fields */}
-          <div className="flex flex-1 flex-wrap divide-x divide-dark/10">
+        <div
+          className="bg-white rounded-2xl shadow-md p-4 md:p-5"
+          style={{ border: "1px solid #ede6db" }}
+        >
+          {/* Desktop: single row */}
+          <div className="hidden md:flex items-end gap-3">
             <FilterSelect
               label="Minimum Rent"
               value={filters.minRent}
               onChange={set("minRent")}
-              placeholder="Set Min Rent"
+              placeholder="£2000 pcm"
               options={rentOptions}
             />
             <FilterSelect
               label="Maximum Rent"
               value={filters.maxRent}
               onChange={set("maxRent")}
-              placeholder="Set Max Rent"
+              placeholder="£5000 pcm"
               options={rentOptions}
             />
             <FilterSelect
@@ -178,16 +184,53 @@ const PropertyHeroSection = ({ onSearch }: PropertyHeroSectionProps) => {
               placeholder="Select Property Type"
               options={typeOptions}
             />
+            <button
+              onClick={() => onSearch(filters)}
+              className="flex items-center justify-center gap-2 bg-camel text-white text-[13px] tracking-wide px-6 py-3 rounded-lg hover:bg-gold transition-colors duration-200 shrink-0 self-end"
+              style={{ fontFamily: "'Lato', sans-serif", minWidth: "120px" }}
+            >
+              Search <SearchIcon />
+            </button>
           </div>
 
-          {/* Search button — full height */}
-          <button
-            onClick={() => onSearch(filters)}
-            className="flex items-center justify-center gap-2 bg-camel text-cream-light text-[13px] tracking-wide px-7 hover:bg-gold transition-colors duration-200 shrink-0"
-            style={{ fontFamily: "'Lato', sans-serif" }}
-          >
-            Search <SearchIcon />
-          </button>
+          {/* Mobile: stacked */}
+          <div className="flex flex-col gap-3 md:hidden">
+            <FilterSelect
+              label="Minimum Rent"
+              value={filters.minRent}
+              onChange={set("minRent")}
+              placeholder="Set Min Rent"
+              options={rentOptions}
+            />
+            <FilterSelect
+              label="Maximum Rent"
+              value={filters.maxRent}
+              onChange={set("maxRent")}
+              placeholder="Set Min Rent"
+              options={rentOptions}
+            />
+            <FilterSelect
+              label="Minimum Beds"
+              value={filters.minBeds}
+              onChange={set("minBeds")}
+              placeholder="Set Min Rent"
+              options={bedOptions}
+            />
+            <FilterSelect
+              label="Type"
+              value={filters.type}
+              onChange={set("type")}
+              placeholder="Set Min Rent"
+              options={typeOptions}
+            />
+            <button
+              onClick={() => onSearch(filters)}
+              className="flex items-center justify-center gap-2 bg-camel text-white text-[13px] tracking-wide w-full py-3.5 rounded-lg hover:bg-gold transition-colors duration-200 mt-1"
+              style={{ fontFamily: "'Lato', sans-serif" }}
+            >
+              Search <SearchIcon />
+            </button>
+          </div>
         </div>
       </div>
     </section>

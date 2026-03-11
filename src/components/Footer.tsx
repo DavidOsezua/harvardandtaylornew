@@ -62,7 +62,7 @@ const Footer = () => {
       <div
         className="relative py-20 px-6 md:px-12 overflow-hidden pb-20"
         style={{
-          backgroundImage: "url('/images/premium-banner.png')",
+          backgroundImage: "url('/images/premium-banner.webp')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}

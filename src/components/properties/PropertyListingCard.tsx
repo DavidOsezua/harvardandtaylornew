@@ -27,9 +27,10 @@ const ViewIcon = () => (
   </svg>
 );
 
-const AvailableIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M5 5h14v14H5zM5 5l7-3 7 3" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+const HomeIcon = () => (
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3 9.5L12 3l9 6.5V21a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+    <path d="M9 22V12h6v10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
@@ -53,23 +54,23 @@ const AreaIcon = () => (
 
 const statusBadgeClass: Record<PropertyListing["status"], string> = {
   "LET AGREED": "bg-white/90 text-dark/80",
-  "FOR SALE": "bg-dark text-cream-light",
-  "AVAILABLE": "bg-camel text-cream-light",
+  "FOR SALE":   "bg-dark text-cream-light",
+  "AVAILABLE":  "bg-camel/90 text-white",
 };
 
 const PropertyListingCard = ({ listing }: { listing: PropertyListing }) => {
   return (
-    <div className="flex flex-col md:flex-row bg-offWhite overflow-hidden shadow-sm">
+    <div className="flex flex-col md:flex-row bg-offWhite overflow-hidden shadow-sm md:h-72.5">
+
       {/* ── Image ── */}
-      <div className="relative md:w-[45%] shrink-0 h-60 md:max-h-100">
+      <div className="relative md:w-[45%] shrink-0 h-60 md:h-full overflow-hidden">
         <img
           src={listing.image}
           alt={listing.address}
           className="w-full h-full object-cover"
         />
-        {/* Status badge over image */}
         <span
-          className={`absolute top-4 left-4 px-3 py-1 text-[10px] font-light tracking-widest uppercase rounded-sm ${statusBadgeClass[listing.status]}`}
+          className={`absolute top-3 left-3 px-2.5 py-1 text-[9px] font-medium tracking-widest uppercase rounded-sm ${statusBadgeClass[listing.status]}`}
           style={{ fontFamily: "'Lato', sans-serif" }}
         >
           {listing.status}
@@ -77,14 +78,15 @@ const PropertyListingCard = ({ listing }: { listing: PropertyListing }) => {
       </div>
 
       {/* ── Content ── */}
-      <div className="flex flex-col justify-between p-7 md:p-10 flex-1 gap-5">
-        <div className="flex flex-col gap-4">
-          {/* Available pill */}
+      <div className="flex flex-col justify-between px-7 py-6 flex-1">
+        <div className="flex flex-col gap-3">
+
+          {/* Available badge */}
           <span
-            className="inline-flex items-center gap-1.5 self-start px-3 py-1 border border-dark/20 rounded-sm text-[10px] tracking-widest uppercase text-dark/60"
+            className="inline-flex items-center gap-1.5 self-start border border-dark/20 px-2.5 py-1 text-[9px] tracking-widest uppercase text-dark/55 rounded-sm"
             style={{ fontFamily: "'Lato', sans-serif" }}
           >
-            <AvailableIcon />
+            <HomeIcon />
             {listing.available ? "Available Now" : "Under Offer"}
           </span>
 
@@ -93,14 +95,14 @@ const PropertyListingCard = ({ listing }: { listing: PropertyListing }) => {
             className="text-coffeeBrown leading-snug"
             style={{
               fontFamily: "'Times New Roman', Times, serif",
-              fontSize: "clamp(1.6rem, 3vw, 2.2rem)",
+              fontSize: "clamp(1.5rem, 2.5vw, 2rem)",
               fontWeight: 400,
             }}
           >
             {listing.address}
           </h2>
 
-          {/* Details row */}
+          {/* Detail pills */}
           <div className="flex flex-wrap gap-2">
             {[
               { icon: <BedIcon />, label: `${listing.beds} Bed` },
@@ -109,11 +111,11 @@ const PropertyListingCard = ({ listing }: { listing: PropertyListing }) => {
             ].map(({ icon, label }) => (
               <span
                 key={label}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-dark/20 rounded-sm text-[11px] text-dark/60 font-light"
-                style={{ fontFamily: "'Inter', sans-serif" }}
+                className="inline-flex items-center gap-1.5 border border-dark/15 px-3 py-1.5 text-[10px] tracking-wider uppercase text-dark/55"
+                style={{ fontFamily: "'Lato', sans-serif" }}
               >
                 <span className="text-tan">{icon}</span>
-                {label.toUpperCase()}
+                {label}
               </span>
             ))}
           </div>
@@ -123,7 +125,7 @@ const PropertyListingCard = ({ listing }: { listing: PropertyListing }) => {
             className="text-coffeeBrown"
             style={{
               fontFamily: "'Times New Roman', Times, serif",
-              fontSize: "clamp(1.4rem, 2.5vw, 1.9rem)",
+              fontSize: "clamp(1.4rem, 2vw, 1.8rem)",
               fontWeight: 400,
             }}
           >
@@ -132,23 +134,24 @@ const PropertyListingCard = ({ listing }: { listing: PropertyListing }) => {
         </div>
 
         {/* CTA buttons */}
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-3 mt-2">
           <a
             href={`mailto:info@harvard-taylor.com?subject=Enquiry: ${listing.address}`}
-            className="inline-flex items-center gap-2 bg-camel text-cream-light text-[12px] tracking-wide px-5 py-2.5 hover:bg-gold transition-colors duration-200"
+            className="inline-flex items-center gap-2 bg-camel text-cream-light text-[11px] tracking-wide px-5 py-2.5 hover:bg-gold transition-colors duration-200 rounded-sm"
             style={{ fontFamily: "'Lato', sans-serif" }}
           >
             Make an Enquiry <EnquiryIcon />
           </a>
           <Link
             to={`/properties/${listing.slug}`}
-            className="inline-flex items-center gap-2 border border-dark/30 text-dark/70 text-[12px] tracking-wide px-5 py-2.5 hover:border-gold hover:text-gold transition-colors duration-200"
+            className="inline-flex items-center gap-2 border border-dark/25 text-dark/65 text-[11px] tracking-wide px-5 py-2.5 hover:border-camel hover:text-camel transition-colors duration-200 rounded-sm"
             style={{ fontFamily: "'Lato', sans-serif" }}
           >
             View Property <ViewIcon />
           </Link>
         </div>
       </div>
+
     </div>
   );
 };

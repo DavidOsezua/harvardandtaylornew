@@ -12,7 +12,7 @@ const PolicyPage = () => {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: "url('/hero-bg.png')",
+            backgroundImage: "url('/images/PrivacyAndTermsHero.webp')",
             backgroundSize: "cover",
             backgroundPosition: "center bottom",
           }}

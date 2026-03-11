@@ -4,7 +4,7 @@ import ListingCard, { type Listing } from "../ListingCard";
 const mockListings: Listing[] = [
   {
     id: "1",
-    image: "/listings/listings1.jpg",
+    image: "/listings/listings1.webp",
     badge: "FOR LET",
     address: "Belmont Close, London, SW4",
     beds: 3,
@@ -16,7 +16,7 @@ const mockListings: Listing[] = [
   },
   {
     id: "2",
-    image: "/listings/listings2.jpg",
+    image: "/listings/listings2.webp",
     badge: "FOR SALE",
     address: "Old Brompton Road, London, SW5",
     beds: 3,
@@ -28,7 +28,7 @@ const mockListings: Listing[] = [
   },
   {
     id: "3",
-    image: "/listings/listings3.jpg",
+    image: "/listings/listings3.webp",
     badge: "FOR LET",
     address: "Belmont Close, London, SW4",
     beds: 3,

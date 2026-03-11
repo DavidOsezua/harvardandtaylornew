@@ -10,6 +10,8 @@ interface PropertyDetail {
   dimensions: string;
   price: string;
   slug: string;
+  description?: string[];
+  features?: string[];
 }
 
 const BedIcon = () => (
@@ -31,21 +33,21 @@ const AreaIcon = () => (
 );
 
 const TourIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.6"/>
     <path d="M9 9l6 3-6 3V9z" fill="currentColor"/>
   </svg>
 );
 
 const FloorplanIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="3" y="3" width="18" height="18" rx="1" stroke="currentColor" strokeWidth="1.6"/>
     <path d="M3 10h8M11 10v11M11 3v7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
   </svg>
 );
 
 const View3DIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M12 3L2 8l10 5 10-5-10-5z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"/>
     <path d="M2 16l10 5 10-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
     <path d="M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
@@ -53,29 +55,30 @@ const View3DIcon = () => (
 );
 
 const FeaturesIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.6"/>
     <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M19.78 4.22l-2.12 2.12M6.34 17.66l-2.12 2.12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
   </svg>
 );
 
 const EnquiryIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.8"/>
     <path d="M7 9h10M7 13h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
   </svg>
 );
 
-const AvailableIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M5 5h14v14H5zM5 5l7-3 7 3" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+const HomeIcon = () => (
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3 9.5L12 3l9 6.5V21a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+    <path d="M9 22V12h6v10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
-const statusBadgeClass: Record<PropertyDetail["status"], string> = {
-  "LET AGREED": "bg-white/90 text-dark/80",
-  "FOR SALE": "bg-dark text-cream-light",
-  "AVAILABLE": "bg-camel text-cream-light",
+const statusStyles: Record<PropertyDetail["status"], string> = {
+  "LET AGREED":  "bg-white/90 text-black/70",
+  "FOR SALE":    "bg-black/70 text-white",
+  "AVAILABLE":   "bg-camel/90 text-white",
 };
 
 interface PropertyDetailHeroProps {
@@ -84,67 +87,79 @@ interface PropertyDetailHeroProps {
 
 const PropertyDetailHero = ({ property }: PropertyDetailHeroProps) => {
   const [currentImg, setCurrentImg] = useState(0);
+  const total = property.images.length;
 
-  const prev = () => setCurrentImg((i) => (i > 0 ? i - 1 : property.images.length - 1));
-  const next = () => setCurrentImg((i) => (i < property.images.length - 1 ? i + 1 : 0));
+  const prev = () => setCurrentImg((i) => (i > 0 ? i - 1 : total - 1));
+  const next = () => setCurrentImg((i) => (i < total - 1 ? i + 1 : 0));
 
   return (
-    <section className="bg-offWhite">
-      <div className="flex flex-col md:flex-row min-h-125">
+    <section className="bg-cream px-4 md:px-10 py-8 md:py-12">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex flex-col md:flex-row gap-0 overflow-hidden rounded-sm shadow-sm">
 
-          {/* ── Image gallery ── */}
-          <div className="relative md:w-1/2 shrink-0 h-72 md:h-auto overflow-hidden">
-            {/* Main image */}
-            <img
-              src={property.images[currentImg]}
-              alt={`${property.address} – image ${currentImg + 1}`}
-              className="w-full h-full object-cover transition-opacity duration-300"
-            />
+          {/* ── Left: Image gallery ── */}
+          <div className="relative md:w-[52%] shrink-0 h-72 md:h-auto min-h-[360px] overflow-hidden">
+            {/* Images */}
+            {property.images.map((src, i) => (
+              <img
+                key={src}
+                src={src}
+                alt={`${property.address} – image ${i + 1}`}
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-400 ${
+                  i === currentImg ? "opacity-100" : "opacity-0"
+                }`}
+              />
+            ))}
 
-            {/* Status badge */}
+            {/* Status badge – top left */}
             <span
-              className={`absolute top-4 left-4 px-3 py-1 text-[10px] font-light tracking-widest uppercase rounded-sm ${statusBadgeClass[property.status]}`}
+              className={`absolute top-3 left-3 z-10 px-2.5 py-1 text-[9px] tracking-widest uppercase font-medium rounded-sm ${statusStyles[property.status]}`}
               style={{ fontFamily: "'Lato', sans-serif" }}
             >
               {property.status}
             </span>
 
-            {/* Photo counter */}
+            {/* Counter – top right */}
             <span
-              className="absolute top-4 right-4 bg-black/40 text-white text-[11px] px-2.5 py-1 rounded-sm"
+              className="absolute top-3 right-3 z-10 bg-black/50 text-white text-[10px] px-2 py-0.5 rounded-sm"
               style={{ fontFamily: "'Lato', sans-serif" }}
             >
-              {currentImg + 1}/{property.images.length}
+              {currentImg + 1}/{total}
             </span>
 
-            {/* Click zones for prev/next */}
-            <button onClick={prev} className="absolute inset-y-0 left-0 w-1/3 cursor-pointer" aria-label="Previous image" />
-            <button onClick={next} className="absolute inset-y-0 right-0 w-1/3 cursor-pointer" aria-label="Next image" />
+            {/* Prev / Next click zones */}
+            <button onClick={prev} className="absolute inset-y-0 left-0 w-2/5 z-10 cursor-pointer" aria-label="Previous image" />
+            <button onClick={next} className="absolute inset-y-0 right-0 w-2/5 z-10 cursor-pointer" aria-label="Next image" />
 
             {/* Dot indicators */}
-            <div className="absolute bottom-4 inset-x-0 flex justify-center gap-1.5">
+            <div className="absolute bottom-3 inset-x-0 z-10 flex justify-center gap-1.5">
               {property.images.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setCurrentImg(i)}
                   aria-label={`Image ${i + 1}`}
                   className={`transition-all duration-200 rounded-full ${
-                    i === currentImg ? "w-5 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/50"
+                    i === currentImg ? "w-4 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/50"
                   }`}
                 />
               ))}
             </div>
           </div>
 
-          {/* ── Property summary ── */}
-          <div className="flex flex-col justify-between px-8 py-8 md:py-10 flex-1 gap-6">
+          {/* ── Right: Property info ── */}
+          <div
+            className="flex flex-col justify-between flex-1 px-7 py-7 bg-cream"
+            style={{ backgroundColor: "#F8F6F0" }}
+          >
+            {/* Top section */}
             <div className="flex flex-col gap-4">
+
               {/* Available badge */}
               <span
-                className="inline-flex items-center gap-1.5 self-start px-3 py-1 border border-dark/20 rounded-sm text-[10px] tracking-widest uppercase text-dark/60"
+                className="inline-flex items-center gap-1.5 self-start border border-black/20 px-2.5 py-1 text-[9px] tracking-widest uppercase text-black/55 rounded-sm"
                 style={{ fontFamily: "'Lato', sans-serif" }}
               >
-                <AvailableIcon />
+                <HomeIcon />
                 {property.available ? "Available Now" : "Under Offer"}
               </span>
 
@@ -153,14 +168,14 @@ const PropertyDetailHero = ({ property }: PropertyDetailHeroProps) => {
                 className="text-coffeeBrown leading-snug"
                 style={{
                   fontFamily: "'Times New Roman', Times, serif",
-                  fontSize: "clamp(1.6rem, 3vw, 2.4rem)",
+                  fontSize: "clamp(1.5rem, 2.8vw, 2.2rem)",
                   fontWeight: 400,
                 }}
               >
                 {property.address}
               </h1>
 
-              {/* Detail tags */}
+              {/* Detail pills */}
               <div className="flex flex-wrap gap-2">
                 {[
                   { icon: <BedIcon />, label: `${property.beds} Bed` },
@@ -169,11 +184,11 @@ const PropertyDetailHero = ({ property }: PropertyDetailHeroProps) => {
                 ].map(({ icon, label }) => (
                   <span
                     key={label}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-dark/20 rounded-sm text-[11px] text-dark/60 font-light"
-                    style={{ fontFamily: "'Inter', sans-serif" }}
+                    className="inline-flex items-center gap-1.5 border border-black/15 px-3 py-1.5 text-[10px] tracking-wider uppercase text-black/55 rounded-sm"
+                    style={{ fontFamily: "'Lato', sans-serif" }}
                   >
-                    <span className="text-tan">{icon}</span>
-                    {label.toUpperCase()}
+                    <span className="opacity-60">{icon}</span>
+                    {label}
                   </span>
                 ))}
               </div>
@@ -183,7 +198,7 @@ const PropertyDetailHero = ({ property }: PropertyDetailHeroProps) => {
                 className="text-coffeeBrown"
                 style={{
                   fontFamily: "'Times New Roman', Times, serif",
-                  fontSize: "clamp(1.4rem, 2.5vw, 2rem)",
+                  fontSize: "clamp(1.5rem, 2.5vw, 2rem)",
                   fontWeight: 400,
                 }}
               >
@@ -191,9 +206,11 @@ const PropertyDetailHero = ({ property }: PropertyDetailHeroProps) => {
               </p>
             </div>
 
-            <div className="flex flex-col gap-4">
-              {/* Feature icon buttons */}
-              <div className="flex gap-3">
+            {/* Bottom section */}
+            <div className="flex flex-col gap-3 mt-6">
+
+              {/* Icon action buttons */}
+              <div className="flex gap-2">
                 {[
                   { icon: <TourIcon />, label: "Virtual Tour" },
                   { icon: <FloorplanIcon />, label: "Floor Plan" },
@@ -203,17 +220,17 @@ const PropertyDetailHero = ({ property }: PropertyDetailHeroProps) => {
                   <button
                     key={label}
                     title={label}
-                    className="flex items-center justify-center w-12 h-12 border border-dark/20 text-dark/50 hover:border-gold hover:text-gold transition-colors duration-200 rounded-sm"
+                    className="flex items-center justify-center w-11 h-11 border border-black/15 text-black/40 hover:border-camel hover:text-camel transition-colors duration-200 rounded-sm"
                   >
                     {icon}
                   </button>
                 ))}
               </div>
 
-              {/* Enquiry button — full width */}
+              {/* Enquiry CTA */}
               <a
                 href={`mailto:info@harvard-taylor.com?subject=Enquiry: ${property.address}`}
-                className="flex items-center justify-center gap-2 bg-camel text-cream-light text-[13px] tracking-wide py-3.5 hover:bg-gold transition-colors duration-200 w-full"
+                className="flex items-center justify-center gap-2 bg-camel text-cream-light text-[12px] tracking-widest uppercase py-3.5 hover:bg-gold transition-colors duration-200 w-full rounded-sm"
                 style={{ fontFamily: "'Lato', sans-serif" }}
               >
                 Make an Enquiry <EnquiryIcon />
@@ -221,6 +238,7 @@ const PropertyDetailHero = ({ property }: PropertyDetailHeroProps) => {
             </div>
           </div>
 
+        </div>
       </div>
     </section>
   );

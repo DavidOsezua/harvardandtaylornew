@@ -8,7 +8,7 @@ const HowWeWorkSection = () => {
         {/* Top image */}
         <div className="w-[80%]">
           <img
-            src="/howWeWorkLeft.png"
+            src="/howWeWorkLeft.webp"
             alt="Modern architecture"
             className="w-full object-cover"
           />
@@ -37,7 +37,7 @@ const HowWeWorkSection = () => {
         {/* Bottom image */}
         <div className="w-[80%] ml-auto">
         <img
-          src="/howWeWorkRight.png"
+          src="/howWeWorkRight.webp"
           alt="Elegant interior"
           className="w-full object-cover"
         />
@@ -49,7 +49,7 @@ const HowWeWorkSection = () => {
         {/* Left image */}
         <div className="w-[28%] shrink-0">
           <img
-            src="/howWeWorkLeft.png"
+            src="/howWeWorkLeft.webp"
             alt="Modern architecture"
             className="w-full h-full object-cover object-center"
           />
@@ -79,7 +79,7 @@ const HowWeWorkSection = () => {
         {/* Right image */}
         <div className="w-[28%] shrink-0 ">
           <img
-            src="/howWeWorkRight.png"
+            src="/howWeWorkRight.webp"
             alt="Elegant interior"
             className="w-full h-full object-cover object-center"
           />
