@@ -1,3 +1,5 @@
+import FadeIn from "../components/FadeIn";
+
 const PhoneIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M6.6 10.8a15.2 15.2 0 006.6 6.6l2.2-2.2a1 1 0 011.05-.24 11.5 11.5 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.5 11.5 0 00.6 3.6 1 1 0 01-.25 1.05L6.6 10.8z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
@@ -46,7 +48,7 @@ const ContactUsPage = () => {
         />
         <div className="absolute inset-0 bg-linear-to-b from-cream/95 via-cream/80 to-cream/30" />
 
-        <div className="relative flex flex-col items-center justify-center text-center px-6 py-28 max-w-3xl mx-auto">
+        <FadeIn className="relative flex flex-col items-center justify-center text-center px-6 py-28 max-w-3xl mx-auto">
           <p
             className="text-camel text-[11px] tracking-[0.25em] uppercase mb-5"
             style={{ fontFamily: "'Lato', sans-serif" }}
@@ -70,7 +72,7 @@ const ContactUsPage = () => {
             Speak with our team today, and take the next step towards refined
             London living.
           </p>
-        </div>
+        </FadeIn>
       </section>
 
       {/* ── Contact Form + Details ── */}
@@ -78,7 +80,7 @@ const ContactUsPage = () => {
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-14 items-start">
 
           {/* Left — form */}
-          <div>
+          <FadeIn from="left">
             <p
               className="text-camel text-[11px] tracking-[0.2em] uppercase mb-2"
               style={{ fontFamily: "'Lato', sans-serif" }}
@@ -168,10 +170,10 @@ const ContactUsPage = () => {
                 Send Enquiry
               </button>
             </form>
-          </div>
+          </FadeIn>
 
           {/* Right — contact details */}
-          <div className="flex flex-col gap-8 md:pt-24">
+          <FadeIn from="right" delay={150} className="flex flex-col gap-8 md:pt-24">
             {contactDetails.map(({ icon, label, value, href }) => (
               <div key={label} className="flex items-start gap-4">
                 <span className="text-camel mt-0.5 shrink-0">{icon}</span>
@@ -203,7 +205,7 @@ const ContactUsPage = () => {
                 </div>
               </div>
             ))}
-          </div>
+          </FadeIn>
 
         </div>
       </section>
@@ -211,48 +213,50 @@ const ContactUsPage = () => {
       {/* ── CTA Banner ── */}
       <section className="bg-cream px-6 md:px-10 pb-16">
         <div className="max-w-5xl mx-auto">
-          <div
-            className="relative overflow-hidden rounded-2xl"
-            style={{ minHeight: "280px" }}
-          >
-            {/* Background image */}
+          <FadeIn>
             <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: "url('/howWeWorkLeft.webp')",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            />
-            {/* Dark overlay */}
-            <div className="absolute inset-0 bg-dark/65" />
-
-            {/* Content */}
-            <div className="relative flex flex-col items-center justify-center text-center px-8 py-20 gap-8">
-              <h2
-                className="text-white uppercase tracking-widest leading-tight"
+              className="relative overflow-hidden rounded-2xl"
+              style={{ minHeight: "280px" }}
+            >
+              {/* Background image */}
+              <div
+                className="absolute inset-0"
                 style={{
-                  fontFamily: "'Times New Roman', Times, serif",
-                  fontSize: "clamp(1.4rem, 3.5vw, 2.2rem)",
-                  fontWeight: 400,
-                  letterSpacing: "0.1em",
+                  backgroundImage: "url('/howWeWorkLeft.webp')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
                 }}
-              >
-                Let's Talk About Your Property
-              </h2>
+              />
+              {/* Dark overlay */}
+              <div className="absolute inset-0 bg-dark/65" />
 
-              <a
-                href="tel:07539521124"
-                className="inline-flex items-center gap-2.5 bg-white/95 text-dark/75 text-[13px] tracking-wide px-7 py-3 rounded-full hover:bg-white transition-colors duration-200"
-                style={{ fontFamily: "'Lato', sans-serif" }}
-              >
-                Get In Touch
-                <span className="text-camel">
-                  <PhoneIcon />
-                </span>
-              </a>
+              {/* Content */}
+              <div className="relative flex flex-col items-center justify-center text-center px-8 py-20 gap-8">
+                <h2
+                  className="text-white uppercase tracking-widest leading-tight"
+                  style={{
+                    fontFamily: "'Times New Roman', Times, serif",
+                    fontSize: "clamp(1.4rem, 3.5vw, 2.2rem)",
+                    fontWeight: 400,
+                    letterSpacing: "0.1em",
+                  }}
+                >
+                  Let's Talk About Your Property
+                </h2>
+
+                <a
+                  href="tel:07539521124"
+                  className="inline-flex items-center gap-2.5 bg-white/95 text-dark/75 text-[13px] tracking-wide px-7 py-3 rounded-full hover:bg-white transition-colors duration-200"
+                  style={{ fontFamily: "'Lato', sans-serif" }}
+                >
+                  Get In Touch
+                  <span className="text-camel">
+                    <PhoneIcon />
+                  </span>
+                </a>
+              </div>
             </div>
-          </div>
+          </FadeIn>
         </div>
       </section>
     </main>

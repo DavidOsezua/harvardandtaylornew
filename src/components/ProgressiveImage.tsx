@@ -1,11 +1,9 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface ProgressiveImageProps {
   src: string;
   alt: string;
-  /** Class applied to the wrapping div */
   className?: string;
-  /** Extra classes forwarded to the full-resolution img (e.g. hover effects) */
   imgClassName?: string;
   style?: React.CSSProperties;
   objectPosition?: string;
@@ -20,10 +18,19 @@ const ProgressiveImage = ({
   objectPosition = "center",
 }: ProgressiveImageProps) => {
   const [loaded, setLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // If the image is already cached the browser won't fire onLoad,
+  // so we also check img.complete immediately after mount.
+  useEffect(() => {
+    if (imgRef.current?.complete) {
+      setLoaded(true);
+    }
+  }, [src]);
 
   return (
     <div className={`relative overflow-hidden ${className}`} style={style}>
-      {/* Tiny blurred placeholder — same src rendered at minimal size, blurred via CSS */}
+      {/* Blurred placeholder — always visible while full-res loads */}
       <img
         src={src}
         alt=""
@@ -36,15 +43,13 @@ const ProgressiveImage = ({
         }}
       />
 
-      {/* Full-resolution image — fades in once the browser has loaded it */}
+      {/* Full-resolution image — fades in once loaded */}
       <img
+        ref={imgRef}
         src={src}
         alt={alt}
         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${imgClassName}`}
-        style={{
-          opacity: loaded ? 1 : 0,
-          objectPosition,
-        }}
+        style={{ opacity: loaded ? 1 : 0, objectPosition }}
         onLoad={() => setLoaded(true)}
         loading="lazy"
       />

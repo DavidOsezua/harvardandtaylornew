@@ -1,3 +1,5 @@
+import FadeIn from "../components/FadeIn";
+
 const TenantAdvicePage = () => {
   return (
     <main>
@@ -13,7 +15,7 @@ const TenantAdvicePage = () => {
         />
         <div className="absolute inset-0 bg-linear-to-b from-cream via-cream/85 to-cream/20" />
 
-        <div className="relative flex flex-col items-center justify-center text-center px-6 py-24 max-w-3xl mx-auto">
+        <FadeIn className="relative flex flex-col items-center justify-center text-center px-6 py-24 max-w-3xl mx-auto">
           <p
             className="text-camel text-[11px] tracking-[0.25em] uppercase mb-5"
             style={{ fontFamily: "'Lato', sans-serif" }}
@@ -39,7 +41,7 @@ const TenantAdvicePage = () => {
             From landlords to tenants, we provide transparent processes, practical
             advice and structured support throughout.
           </p>
-        </div>
+        </FadeIn>
       </section>
 
       {/* ── Clear Guidance intro ── */}
@@ -47,7 +49,7 @@ const TenantAdvicePage = () => {
         <div className="max-w-5xl mx-auto">
 
           {/* Intro heading + subtitle */}
-          <div className="text-center mb-14">
+          <FadeIn className="text-center mb-14">
             <h2
               className="text-gold mb-5"
               style={{
@@ -66,121 +68,125 @@ const TenantAdvicePage = () => {
               Harvard &amp; Taylor is here to make the process simple, transparent, and
               stress-free.
             </p>
-          </div>
+          </FadeIn>
 
           {/* Process heading */}
-          <h2
-            className="text-gold text-center mb-10"
-            style={{
-              fontFamily: "'Times New Roman', Times, serif",
-              fontSize: "clamp(1.6rem, 3vw, 2.2rem)",
-              fontWeight: 400,
-            }}
-          >
-            Renting a Property with Harvard &amp; Taylor
-          </h2>
+          <FadeIn delay={100}>
+            <h2
+              className="text-gold text-center mb-10"
+              style={{
+                fontFamily: "'Times New Roman', Times, serif",
+                fontSize: "clamp(1.6rem, 3vw, 2.2rem)",
+                fontWeight: 400,
+              }}
+            >
+              Renting a Property with Harvard &amp; Taylor
+            </h2>
+          </FadeIn>
 
           {/* Steps grid */}
-          <div className="border border-dark/10" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <FadeIn delay={200}>
+            <div className="border border-dark/10" style={{ fontFamily: "'Inter', sans-serif" }}>
 
-            {/* Row 1: 01 + 02 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-dark/10 border-b border-dark/10">
-              {[
-                {
-                  num: "01",
-                  title: "Search & Register Interest",
-                  body: "Browse our available properties online. Found one you like? Contact us or register your interest — we'll arrange a viewing that suits your schedule.",
-                },
-                {
-                  num: "02",
-                  title: "Book a Viewing",
-                  body: "We'll show you around the property, answer any questions, and give you honest, clear details on rent, utilities, and tenancy terms.",
-                },
-              ].map(({ num, title, body }) => (
-                <div key={num} className="p-8 flex flex-col gap-3">
-                  <span className="text-gold/60 text-[12px]" style={{ fontFamily: "'Lato', sans-serif" }}>{num}</span>
-                  <h3
-                    className="text-dark/80"
-                    style={{
-                      fontFamily: "'Times New Roman', Times, serif",
-                      fontSize: "clamp(1.1rem, 2vw, 1.3rem)",
-                      fontWeight: 400,
-                    }}
-                  >
-                    {title}
-                  </h3>
-                  <p className="text-dark/60 text-[13px] font-light leading-relaxed">{body}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Row 2: 03 full width */}
-            <div className="p-8 flex flex-col gap-3 border-b border-dark/10">
-              <span className="text-gold/60 text-[12px]" style={{ fontFamily: "'Lato', sans-serif" }}>03</span>
-              <h3
-                className="text-dark/80"
-                style={{
-                  fontFamily: "'Times New Roman', Times, serif",
-                  fontSize: "clamp(1.1rem, 2vw, 1.3rem)",
-                  fontWeight: 400,
-                }}
-              >
-                Apply &amp; Be Referenced
-              </h3>
-              <p className="text-dark/60 text-[13px] font-light leading-relaxed mb-2">
-                Ready to move in? We'll ask you to complete an application form and begin
-                referencing via our trusted partner, Homelet referencing. This includes:
-              </p>
-              <div className="text-dark/60 text-[13px] font-light leading-relaxed flex flex-col gap-1">
-                <p>- Credit checks</p>
-                <p>- Employment &amp; income verification</p>
-                <p>- Previous landlord references</p>
-                <p>- Right to Rent checks (photo ID &amp; visa/residency documents if applicable)</p>
+              {/* Row 1: 01 + 02 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-dark/10 border-b border-dark/10">
+                {[
+                  {
+                    num: "01",
+                    title: "Search & Register Interest",
+                    body: "Browse our available properties online. Found one you like? Contact us or register your interest — we'll arrange a viewing that suits your schedule.",
+                  },
+                  {
+                    num: "02",
+                    title: "Book a Viewing",
+                    body: "We'll show you around the property, answer any questions, and give you honest, clear details on rent, utilities, and tenancy terms.",
+                  },
+                ].map(({ num, title, body }) => (
+                  <div key={num} className="p-8 flex flex-col gap-3">
+                    <span className="text-gold/60 text-[12px]" style={{ fontFamily: "'Lato', sans-serif" }}>{num}</span>
+                    <h3
+                      className="text-dark/80"
+                      style={{
+                        fontFamily: "'Times New Roman', Times, serif",
+                        fontSize: "clamp(1.1rem, 2vw, 1.3rem)",
+                        fontWeight: 400,
+                      }}
+                    >
+                      {title}
+                    </h3>
+                    <p className="text-dark/60 text-[13px] font-light leading-relaxed">{body}</p>
+                  </div>
+                ))}
               </div>
-            </div>
 
-            {/* Row 3: 04 + 05 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-dark/10">
-              {[
-                {
-                  num: "04",
-                  title: "Deposit & Holding Fee",
-                  body: (
-                    <>
-                      <p>We'll request a holding deposit (1 week's rent) to secure the property while final checks are completed.</p>
-                      <p className="mt-2">This is deducted from your first month's rent if you proceed.</p>
-                    </>
-                  ),
-                },
-                {
-                  num: "05",
-                  title: "Sign & Move In",
-                  body: (
-                    <>
-                      <p>You'll receive your tenancy agreement to sign digitally. Once the deposit and first month's rent are received, you'll get your keys and move-in info.</p>
-                      <p className="mt-2">Welcome to your new home!</p>
-                    </>
-                  ),
-                },
-              ].map(({ num, title, body }) => (
-                <div key={num} className="p-8 flex flex-col gap-3">
-                  <span className="text-gold/60 text-[12px]" style={{ fontFamily: "'Lato', sans-serif" }}>{num}</span>
-                  <h3
-                    className="text-dark/80"
-                    style={{
-                      fontFamily: "'Times New Roman', Times, serif",
-                      fontSize: "clamp(1.1rem, 2vw, 1.3rem)",
-                      fontWeight: 400,
-                    }}
-                  >
-                    {title}
-                  </h3>
-                  <div className="text-dark/60 text-[13px] font-light leading-relaxed">{body}</div>
+              {/* Row 2: 03 full width */}
+              <div className="p-8 flex flex-col gap-3 border-b border-dark/10">
+                <span className="text-gold/60 text-[12px]" style={{ fontFamily: "'Lato', sans-serif" }}>03</span>
+                <h3
+                  className="text-dark/80"
+                  style={{
+                    fontFamily: "'Times New Roman', Times, serif",
+                    fontSize: "clamp(1.1rem, 2vw, 1.3rem)",
+                    fontWeight: 400,
+                  }}
+                >
+                  Apply &amp; Be Referenced
+                </h3>
+                <p className="text-dark/60 text-[13px] font-light leading-relaxed mb-2">
+                  Ready to move in? We'll ask you to complete an application form and begin
+                  referencing via our trusted partner, Homelet referencing. This includes:
+                </p>
+                <div className="text-dark/60 text-[13px] font-light leading-relaxed flex flex-col gap-1">
+                  <p>- Credit checks</p>
+                  <p>- Employment &amp; income verification</p>
+                  <p>- Previous landlord references</p>
+                  <p>- Right to Rent checks (photo ID &amp; visa/residency documents if applicable)</p>
                 </div>
-              ))}
-            </div>
+              </div>
 
-          </div>
+              {/* Row 3: 04 + 05 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-dark/10">
+                {[
+                  {
+                    num: "04",
+                    title: "Deposit & Holding Fee",
+                    body: (
+                      <>
+                        <p>We'll request a holding deposit (1 week's rent) to secure the property while final checks are completed.</p>
+                        <p className="mt-2">This is deducted from your first month's rent if you proceed.</p>
+                      </>
+                    ),
+                  },
+                  {
+                    num: "05",
+                    title: "Sign & Move In",
+                    body: (
+                      <>
+                        <p>You'll receive your tenancy agreement to sign digitally. Once the deposit and first month's rent are received, you'll get your keys and move-in info.</p>
+                        <p className="mt-2">Welcome to your new home!</p>
+                      </>
+                    ),
+                  },
+                ].map(({ num, title, body }) => (
+                  <div key={num} className="p-8 flex flex-col gap-3">
+                    <span className="text-gold/60 text-[12px]" style={{ fontFamily: "'Lato', sans-serif" }}>{num}</span>
+                    <h3
+                      className="text-dark/80"
+                      style={{
+                        fontFamily: "'Times New Roman', Times, serif",
+                        fontSize: "clamp(1.1rem, 2vw, 1.3rem)",
+                        fontWeight: 400,
+                      }}
+                    >
+                      {title}
+                    </h3>
+                    <div className="text-dark/60 text-[13px] font-light leading-relaxed">{body}</div>
+                  </div>
+                ))}
+              </div>
+
+            </div>
+          </FadeIn>
         </div>
       </section>
 
@@ -189,7 +195,7 @@ const TenantAdvicePage = () => {
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
 
           {/* Left — text */}
-          <div className="flex flex-col gap-5 text-[13px] font-light text-dark/65 leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <FadeIn from="left" className="flex flex-col gap-5 text-[13px] font-light text-dark/65 leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>
             <h2
               className="text-gold"
               style={{
@@ -239,16 +245,16 @@ const TenantAdvicePage = () => {
             >
               View PDF Guide
             </a>
-          </div>
+          </FadeIn>
 
           {/* Right — image */}
-          <div className="overflow-hidden rounded-sm h-[460px]">
+          <FadeIn from="right" delay={150} className="overflow-hidden rounded-sm h-[460px]">
             <img
               src="/listings/listings1.webp"
               alt="Interior"
               className="w-full h-full object-cover"
             />
-          </div>
+          </FadeIn>
 
         </div>
       </section>

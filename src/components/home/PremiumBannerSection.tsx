@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import FadeIn from "../FadeIn";
 
 const PremiumBannerSection = () => {
   return (
@@ -13,7 +14,7 @@ const PremiumBannerSection = () => {
       <div className="absolute inset-0 bg-dark/60" />
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 py-20 md:py-28">
+      <FadeIn className="relative z-10 flex flex-col items-center justify-center text-center px-6 py-20 md:py-28">
         {/* Circular badge */}
         <div className="w-50">
           <img src="/images/logo.png" alt="" className="w-full h-full" />
@@ -21,7 +22,7 @@ const PremiumBannerSection = () => {
 
         {/* Heading */}
         <h2
-          className="text-cream-light uppercase leading-tight max-w-3xl mb-5"
+          className="text-white uppercase leading-tight max-w-3xl mb-5"
           style={{
             fontFamily: "'Times New Roman', Times, serif",
             fontSize: "clamp(1.5rem, 4vw, 2.75rem)",
@@ -34,7 +35,7 @@ const PremiumBannerSection = () => {
 
         {/* Subtitle */}
         <p
-          className="text-cream-light/70 text-sm md:text-base font-light max-w-xl mb-10 leading-relaxed"
+          className="text-white text-sm md:text-base font-light max-w-xl mb-10 leading-relaxed"
           style={{ fontFamily: "'Inter', sans-serif" }}
         >
           Thoughtfully presented homes for long-term let, matched with tenants
@@ -49,7 +50,7 @@ const PremiumBannerSection = () => {
         >
           About Us
         </Link>
-      </div>
+      </FadeIn>
     </section>
   );
 };

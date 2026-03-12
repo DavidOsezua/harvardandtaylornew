@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import ListingCard, { type Listing } from "../ListingCard";
+import FadeIn from "../FadeIn";
 
 const mockListings: Listing[] = [
   {
@@ -47,7 +48,7 @@ const LatestListingsSection = () => {
 
         {/* Heading */}
         <h2
-          className="text-dark mb-8 text-3xl font-normal"
+          className="text-gold mb-8 text-3xl font-normal"
           style={{ fontFamily: "'Times New Roman', Times, serif" }}
         >
           Latest listings
@@ -55,13 +56,15 @@ const LatestListingsSection = () => {
 
         {/* Cards grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockListings.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} />
+          {mockListings.map((listing, i) => (
+            <FadeIn key={listing.id} delay={i * 120}>
+              <ListingCard listing={listing} />
+            </FadeIn>
           ))}
         </div>
 
         {/* View all button — bottom right */}
-        <div className="flex justify-end mt-8">
+        <FadeIn delay={400} className="flex justify-end mt-8">
           <Link
             to="/properties"
             className="inline-flex items-center gap-2 bg-gold text-cream-light rounded-full px-6 py-3 text-sm font-light tracking-wide hover:bg-dark transition-colors duration-200"
@@ -70,7 +73,7 @@ const LatestListingsSection = () => {
             View Our Properties
             <span>→</span>
           </Link>
-        </div>
+        </FadeIn>
 
       </div>
     </section>

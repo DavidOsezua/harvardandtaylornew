@@ -1,3 +1,5 @@
+import FadeIn from "../components/FadeIn";
+
 const AboutPage = () => {
   return (
     <main>
@@ -13,7 +15,7 @@ const AboutPage = () => {
         />
         <div className="absolute inset-0 bg-linear-to-b from-cream/95 via-cream/80 to-cream/30" />
 
-        <div className="relative flex flex-col items-center justify-center text-center px-6 py-28 max-w-4xl mx-auto">
+        <FadeIn className="relative flex flex-col items-center justify-center text-center px-6 py-28 max-w-4xl mx-auto">
           <p
             className="text-camel text-[11px] tracking-[0.25em] uppercase mb-5"
             style={{ fontFamily: "'Lato', sans-serif" }}
@@ -39,7 +41,7 @@ const AboutPage = () => {
             We combine market expertise with personal service, delivering considered
             lettings experience.
           </p>
-        </div>
+        </FadeIn>
       </section>
 
       {/* ── The Principal ── */}
@@ -47,16 +49,16 @@ const AboutPage = () => {
         <div className="max-w-xl mx-auto flex flex-col items-center text-center gap-6">
 
           {/* Portrait */}
-          <div className="w-full max-w-[500px] overflow-hidden rounded-sm">
+          <FadeIn className="w-full max-w-125 overflow-hidden rounded-sm">
             <img
               src="/images/team.webp"
               alt="The Principal – Managing Director"
               className="w-full h-auto object-cover"
             />
-          </div>
+          </FadeIn>
 
           {/* Name / Title */}
-          <div className="flex flex-col gap-1.5 mt-2">
+          <FadeIn delay={100} className="flex flex-col gap-1.5 mt-2">
             <h2
               className="text-gold"
               style={{
@@ -74,13 +76,10 @@ const AboutPage = () => {
             >
               Managing Director
             </p>
-          </div>
+          </FadeIn>
 
           {/* Body copy */}
-          <div
-            className="flex flex-col gap-4 text-dark/60 text-[14px] font-light leading-relaxed max-w-md"
-            style={{ fontFamily: "'Inter', sans-serif" }}
-          >
+          <FadeIn delay={200} className="flex flex-col gap-4 text-dark/60 text-[14px] font-light leading-relaxed max-w-md" style={{ fontFamily: "'Inter', sans-serif" }}>
             <p>
               We combine current market expertise with your personalised needs to
               deliver a bespoke experience for every step.
@@ -93,16 +92,16 @@ const AboutPage = () => {
               Our specialist team are ready to assist you with each of your property
               needs.
             </p>
-          </div>
+          </FadeIn>
 
           {/* Badge seal */}
-          <div className="mt-4 w-38 h-38">
+          <FadeIn delay={300} className="mt-4 w-38 h-38">
             <img
               src="/images/logo2.png"
               alt="Harvard & Taylor Certified Listings"
               className="w-full h-full object-contain"
             />
-          </div>
+          </FadeIn>
 
         </div>
       </section>

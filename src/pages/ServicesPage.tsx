@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import FadeIn from "../components/FadeIn";
 
 const ServicesPage = () => {
   return (
@@ -62,44 +63,47 @@ const ServicesPage = () => {
       <section className="bg-cream py-12 px-6 md:px-10">
         <div className="max-w-6xl mx-auto flex flex-col gap-5">
           {/* Large top card */}
-          <div className="relative overflow-hidden rounded-lg min-h-[280px]">
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: "url('/images/service.webp')",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            />
-            <div className="absolute inset-0 bg-dark/60" />
-            <div className="relative flex flex-col items-center justify-center text-center px-8 py-16 h-full">
-              <h2
-                className="text-white uppercase leading-tight mb-4"
+          <FadeIn>
+            <div className="relative overflow-hidden rounded-lg min-h-[280px]">
+              <div
+                className="absolute inset-0"
                 style={{
-                  fontFamily: "'Times New Roman', Times, serif",
-                  fontSize: "clamp(1.6rem, 3.5vw, 2.6rem)",
-                  fontWeight: 400,
-                  letterSpacing: "0.04em",
+                  backgroundImage: "url('/images/service.webp')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
                 }}
-              >
-                Property Management
-                <br />
-                Services for Landlords
-              </h2>
-              <p
-                className="text-white/75 text-[13px] font-light leading-relaxed max-w-xl"
-                style={{ fontFamily: "'Inter', sans-serif" }}
-              >
-                Comprehensive management solutions, from marketing and tenant
-                sourcing to rent collection, compliance and ongoing property
-                care, ensuring your investment is protected and performing at
-                its best.
-              </p>
+              />
+              <div className="absolute inset-0 bg-dark/60" />
+              <div className="relative flex flex-col items-center justify-center text-center px-8 py-16 h-full">
+                <h2
+                  className="text-white uppercase leading-tight mb-4"
+                  style={{
+                    fontFamily: "'Times New Roman', Times, serif",
+                    fontSize: "clamp(1.6rem, 3.5vw, 2.6rem)",
+                    fontWeight: 400,
+                    letterSpacing: "0.04em",
+                  }}
+                >
+                  Property Management
+                  <br />
+                  Services for Landlords
+                </h2>
+                <p
+                  className="text-white/75 text-[13px] font-light leading-relaxed max-w-xl"
+                  style={{ fontFamily: "'Inter', sans-serif" }}
+                >
+                  Comprehensive management solutions, from marketing and tenant
+                  sourcing to rent collection, compliance and ongoing property
+                  care, ensuring your investment is protected and performing at
+                  its best.
+                </p>
+              </div>
             </div>
-          </div>
+          </FadeIn>
 
           {/* Two smaller cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <FadeIn delay={150}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Landlord Advice */}
             <Link
               to="/services/landlord-advice"
@@ -177,7 +181,8 @@ const ServicesPage = () => {
                 </p>
               </div>
             </Link>
-          </div>
+            </div>
+          </FadeIn>
         </div>
       </section>
     </main>

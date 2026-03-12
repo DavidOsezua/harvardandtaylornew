@@ -3,6 +3,7 @@ import PropertyDetailHero, {
   type PropertyDetail,
 } from "../components/properties/PropertyDetailHero";
 import ListingCard, { type Listing } from "../components/ListingCard";
+import FadeIn from "../components/FadeIn";
 
 const mockProperties: Record<string, PropertyDetail> = {
   "belmont-close-london-sw4-1": {
@@ -195,7 +196,7 @@ const PropertyDetailPage = () => {
       {/* ── About this property ── */}
       {property.description && (
         <section className="px-4 md:px-10 py-10 md:py-14 bg-white">
-          <div className="max-w-6xl mx-auto">
+          <FadeIn className="max-w-6xl mx-auto">
             <h2
               className="mb-5 text-gold"
               style={{
@@ -221,15 +222,14 @@ const PropertyDetailPage = () => {
                 </p>
               ))}
             </div>
-          </div>
+          </FadeIn>
         </section>
       )}
 
-   
       {/* ── Property Features + Map ── */}
       {property.features && (
         <section className="px-4 md:px-10 py-10 md:py-14 bg-cream">
-          <div className="max-w-6xl mx-auto">
+          <FadeIn className="max-w-6xl mx-auto">
             <div className="flex flex-col md:flex-row gap-10 md:gap-16">
               {/* Features */}
               <div className="flex-1">
@@ -273,11 +273,11 @@ const PropertyDetailPage = () => {
                 />
               </div>
             </div>
-          </div>
+          </FadeIn>
         </section>
       )}
 
-         {/* ── View More Listings ── */}
+      {/* ── View More Listings ── */}
       {(() => {
         const others = Object.values(mockProperties)
           .filter((p) => p.slug !== property.slug)
@@ -296,24 +296,25 @@ const PropertyDetailPage = () => {
           }));
         return (
           <section className="px-4 md:px-10 py-10 md:py-14 bg-cream">
-            <div className="max-w-6xl mx-auto">
+            <FadeIn className="max-w-6xl mx-auto">
               <h2
                 className="mb-8 text-gold"
                 style={{
                   fontFamily: "'Times New Roman', Times, serif",
                   fontSize: "clamp(1.8rem, 3vw, 2.5rem)",
                   fontWeight: 400,
-           
                 }}
               >
                 View More Listings.
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {others.map((listing) => (
-                  <ListingCard key={listing.id} listing={listing} />
+                {others.map((listing, i) => (
+                  <FadeIn key={listing.id} delay={i * 120}>
+                    <ListingCard listing={listing} />
+                  </FadeIn>
                 ))}
               </div>
-            </div>
+            </FadeIn>
           </section>
         );
       })()}

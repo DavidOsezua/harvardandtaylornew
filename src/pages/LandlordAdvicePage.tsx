@@ -1,3 +1,5 @@
+import FadeIn from "../components/FadeIn";
+
 const ExternalLinkIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
     <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
@@ -26,7 +28,7 @@ const LandlordAdvicePage = () => {
         />
         <div className="absolute inset-0 bg-linear-to-b from-cream via-cream/85 to-cream/20" />
 
-        <div className="relative flex flex-col items-center justify-center text-center px-6 py-24 max-w-3xl mx-auto">
+        <FadeIn className="relative flex flex-col items-center justify-center text-center px-6 py-24 max-w-3xl mx-auto">
           <p
             className="text-camel text-[11px] tracking-[0.25em] uppercase mb-5"
             style={{ fontFamily: "'Lato', sans-serif" }}
@@ -49,7 +51,7 @@ const LandlordAdvicePage = () => {
           >
             Practical advice and services for all your property needs in one place.
           </p>
-        </div>
+        </FadeIn>
       </section>
 
       {/* ── Content ── */}
@@ -57,7 +59,7 @@ const LandlordAdvicePage = () => {
         <div className="max-w-5xl mx-auto">
 
           {/* Section heading */}
-          <div className="text-center mb-14">
+          <FadeIn className="text-center mb-14">
             <h2
               className="text-gold mb-4"
               style={{
@@ -75,13 +77,13 @@ const LandlordAdvicePage = () => {
               We're here to help you navigate through all compliance and legal
               requirements for your current or future property.
             </p>
-          </div>
+          </FadeIn>
 
           {/* Two-column layout */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
 
             {/* Left — article */}
-            <div>
+            <FadeIn from="left">
               <h3
                 className="text-gold mb-4"
                 style={{
@@ -115,10 +117,10 @@ const LandlordAdvicePage = () => {
                   <li key={item}>– {item}</li>
                 ))}
               </ul>
-            </div>
+            </FadeIn>
 
             {/* Right — resource links */}
-            <div className="flex flex-col divide-y divide-dark/10">
+            <FadeIn from="right" delay={150} className="flex flex-col divide-y divide-dark/10">
               {externalLinks.map(({ label, href }) => (
                 <a
                   key={label}
@@ -132,7 +134,7 @@ const LandlordAdvicePage = () => {
                   <ExternalLinkIcon />
                 </a>
               ))}
-            </div>
+            </FadeIn>
 
           </div>
         </div>
@@ -141,86 +143,90 @@ const LandlordAdvicePage = () => {
       {/* ── The Lettings Process ── */}
       <section className="bg-offWhite py-16 px-6 md:px-10">
         <div className="max-w-5xl mx-auto">
-          <h2
-            className="text-gold text-center mb-10"
-            style={{
-              fontFamily: "'Times New Roman', Times, serif",
-              fontSize: "clamp(1.8rem, 3.5vw, 2.6rem)",
-              fontWeight: 400,
-            }}
-          >
-            The Lettings Process
-          </h2>
+          <FadeIn>
+            <h2
+              className="text-gold text-center mb-10"
+              style={{
+                fontFamily: "'Times New Roman', Times, serif",
+                fontSize: "clamp(1.8rem, 3.5vw, 2.6rem)",
+                fontWeight: 400,
+              }}
+            >
+              The Lettings Process
+            </h2>
+          </FadeIn>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 divide-y divide-x-0 md:divide-x md:divide-y-0 divide-dark/10 border border-dark/10">
-            {[
-              {
-                num: "01",
-                title: "Free Valuation & Advice",
-                content: (
-                  <p className="text-dark/60 text-[13px] font-light leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>
-                    We provide an accurate rental valuation, tailored advice, and discuss
-                    the service level that suits you best — Tenant Find (6%), Rent
-                    Collection (8%), or Full Management (12%).
-                  </p>
-                ),
-              },
-              {
-                num: "02",
-                title: "Marketing Your Property",
-                content: (
-                  <div className="text-dark/60 text-[13px] font-light leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>
-                    <p className="font-semibold text-dark/75 mb-2">Professional listings on major portals</p>
-                    <p>– Photography and descriptions to attract quality tenants</p>
-                    <p>– Local advertising and direct tenant database matching</p>
-                  </div>
-                ),
-              },
-              {
-                num: "03",
-                title: "Viewings & Tenant Selection",
-                content: (
-                  <p className="text-dark/60 text-[13px] font-light leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>
-                    We handle enquiries, viewings, and initial screening to ensure only
-                    suitable tenants are shortlisted.
-                  </p>
-                ),
-              },
-              {
-                num: "04",
-                title: "Referencing & Tenancy Package",
-                content: (
-                  <div className="text-dark/60 text-[13px] font-light leading-relaxed flex flex-col gap-1" style={{ fontFamily: "'Inter', sans-serif" }}>
-                    <p className="font-semibold text-dark/75 mb-1">Full referencing via Homelet</p>
-                    <p>– Right to Rent checks</p>
-                    <p>– Tenancy agreement drafting</p>
-                    <p>– Holding deposit collection (in line with legislation)</p>
-                    <p className="mt-3 font-semibold text-dark/75">(Tenancy package available at £200)</p>
-                  </div>
-                ),
-              },
-            ].map(({ num, title, content }) => (
-              <div key={num} className="p-8 flex flex-col gap-3">
-                <span
-                  className="text-gold/60 text-[12px] font-light"
-                  style={{ fontFamily: "'Lato', sans-serif" }}
-                >
-                  {num}
-                </span>
-                <h3
-                  className="text-dark/80"
-                  style={{
-                    fontFamily: "'Times New Roman', Times, serif",
-                    fontSize: "clamp(1.1rem, 2vw, 1.35rem)",
-                    fontWeight: 400,
-                  }}
-                >
-                  {title}
-                </h3>
-                {content}
-              </div>
-            ))}
-          </div>
+          <FadeIn delay={100}>
+            <div className="grid grid-cols-1 md:grid-cols-2 divide-y divide-x-0 md:divide-x md:divide-y-0 divide-dark/10 border border-dark/10">
+              {[
+                {
+                  num: "01",
+                  title: "Free Valuation & Advice",
+                  content: (
+                    <p className="text-dark/60 text-[13px] font-light leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>
+                      We provide an accurate rental valuation, tailored advice, and discuss
+                      the service level that suits you best — Tenant Find (6%), Rent
+                      Collection (8%), or Full Management (12%).
+                    </p>
+                  ),
+                },
+                {
+                  num: "02",
+                  title: "Marketing Your Property",
+                  content: (
+                    <div className="text-dark/60 text-[13px] font-light leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>
+                      <p className="font-semibold text-dark/75 mb-2">Professional listings on major portals</p>
+                      <p>– Photography and descriptions to attract quality tenants</p>
+                      <p>– Local advertising and direct tenant database matching</p>
+                    </div>
+                  ),
+                },
+                {
+                  num: "03",
+                  title: "Viewings & Tenant Selection",
+                  content: (
+                    <p className="text-dark/60 text-[13px] font-light leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>
+                      We handle enquiries, viewings, and initial screening to ensure only
+                      suitable tenants are shortlisted.
+                    </p>
+                  ),
+                },
+                {
+                  num: "04",
+                  title: "Referencing & Tenancy Package",
+                  content: (
+                    <div className="text-dark/60 text-[13px] font-light leading-relaxed flex flex-col gap-1" style={{ fontFamily: "'Inter', sans-serif" }}>
+                      <p className="font-semibold text-dark/75 mb-1">Full referencing via Homelet</p>
+                      <p>– Right to Rent checks</p>
+                      <p>– Tenancy agreement drafting</p>
+                      <p>– Holding deposit collection (in line with legislation)</p>
+                      <p className="mt-3 font-semibold text-dark/75">(Tenancy package available at £200)</p>
+                    </div>
+                  ),
+                },
+              ].map(({ num, title, content }) => (
+                <div key={num} className="p-8 flex flex-col gap-3">
+                  <span
+                    className="text-gold/60 text-[12px] font-light"
+                    style={{ fontFamily: "'Lato', sans-serif" }}
+                  >
+                    {num}
+                  </span>
+                  <h3
+                    className="text-dark/80"
+                    style={{
+                      fontFamily: "'Times New Roman', Times, serif",
+                      fontSize: "clamp(1.1rem, 2vw, 1.35rem)",
+                      fontWeight: 400,
+                    }}
+                  >
+                    {title}
+                  </h3>
+                  {content}
+                </div>
+              ))}
+            </div>
+          </FadeIn>
         </div>
       </section>
 
@@ -229,7 +235,7 @@ const LandlordAdvicePage = () => {
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
 
           {/* Left — text */}
-          <div className="flex flex-col gap-5 text-[13px] font-light text-dark/65 leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <FadeIn from="left" className="flex flex-col gap-5 text-[13px] font-light text-dark/65 leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>
             <h2
               className="text-gold"
               style={{
@@ -269,16 +275,16 @@ const LandlordAdvicePage = () => {
               <p>– Tenant queries &amp; 24/7 contact</p>
               <p>– Arrears management and legal guidance</p>
             </div>
-          </div>
+          </FadeIn>
 
           {/* Right — image */}
-          <div className="overflow-hidden rounded-sm h-[420px]">
+          <FadeIn from="right" delay={150} className="overflow-hidden rounded-sm h-[420px]">
             <img
               src="/listings/listings2.webp"
               alt="Interior"
               className="w-full h-full object-cover"
             />
-          </div>
+          </FadeIn>
 
         </div>
       </section>
