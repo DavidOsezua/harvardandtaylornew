@@ -17,7 +17,7 @@ const PolicyContent = () => {
               1. Who We Are
             </h2>
             <p className="text-black font-sans text-base md:text-lg leading-relaxed">
-              Harvard & Taylor is a property lettings and management agency based in the United Kingdom. Our registered business address is available upon request. For data protection purposes, we act as the "data controller" of your personal information.
+              Harvard & Taylor is a property lettings and management agency based in the United Kingdom. For data protection purposes, we act as the "data controller" of your personal information.
             </p>
           </div>
 
