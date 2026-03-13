@@ -137,7 +137,7 @@ const PropertyListingCard = ({ listing }: { listing: PropertyListing }) => {
         {/* CTA buttons */}
         <div className="flex flex-wrap gap-3 mt-2">
           <a
-            href={`mailto:info@harvard-taylor.com?subject=Enquiry: ${listing.address}`}
+            href={`mailto:info@harvardandtaylor.com?subject=Enquiry: ${listing.address}`}
             className="inline-flex items-center gap-2 bg-camel text-cream-light text-[11px] tracking-wide px-5 py-2.5 hover:bg-gold transition-colors duration-200 rounded-sm"
             style={{ fontFamily: "'Lato', sans-serif" }}
           >

@@ -154,7 +154,7 @@ const PolicyContent = () => {
             </p>
             <div className="text-black font-sans text-base md:text-lg leading-relaxed space-y-1">
               <p className="font-semibold">Data Protection Officer, Harvard & Taylor</p>
-              <p>Email: <a href="mailto:info@harvard-taylor.com" className="underline hover:opacity-70">info@harvard-taylor.com</a></p>
+              <p>Email: <a href="mailto:info@harvardandtaylor.com" className="underline hover:opacity-70">info@harvardandtaylor.com</a></p>
             </div>
           </div>
 

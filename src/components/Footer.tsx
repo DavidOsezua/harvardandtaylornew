@@ -111,25 +111,25 @@ const Footer = () => {
               <ul className="flex flex-col gap-3">
                 <li>
                   <a
-                    href="tel:07539521124"
+                    href="tel:03330506413"
                     className="flex items-center gap-2 text-cream-light/70 text-[11px] font-light hover:text-cream-light transition-colors duration-200 tracking-wide"
                     style={{ fontFamily: "'Lato', sans-serif" }}
                   >
-                    <PhoneIcon /> 07539 521124
+                    <PhoneIcon /> 03330 506413
                   </a>
                 </li>
                 <li>
                   <a
-                    href="mailto:info@harvard-taylor.com"
+                    href="mailto:info@harvardandtaylor.com"
                     className="flex items-center gap-2 text-cream-light/70 text-[11px] font-light hover:text-cream-light transition-colors duration-200 tracking-wide uppercase"
                     style={{ fontFamily: "'Lato', sans-serif" }}
                   >
-                    <EmailIcon /> info@harvard-taylor.com
+                    <EmailIcon /> info@harvardandtaylor.com
                   </a>
                 </li>
                 <li className="flex items-center gap-4">
                   <a
-                    href="https://wa.me/447729533124"
+                    href="https://wa.me/447822013391"
                     className="flex items-center gap-2 text-cream-light/70 text-[11px] font-light hover:text-cream-light transition-colors duration-200 tracking-wide uppercase"
                     style={{ fontFamily: "'Lato', sans-serif" }}
                   >
@@ -159,11 +159,13 @@ const Footer = () => {
                 className="not-italic text-cream-light/70 text-[11px] font-light leading-relaxed tracking-wide uppercase"
                 style={{ fontFamily: "'Lato', sans-serif" }}
               >
-                153A Rye Lane,
+                Office 110, 49-65
+                <br />
+                Southampton Way,
                 <br />
                 London,
                 <br />
-                Peckham, SE15 4TL
+                SE5 7SW
               </address>
             </div>
 

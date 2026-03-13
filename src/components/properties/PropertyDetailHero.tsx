@@ -229,7 +229,7 @@ const PropertyDetailHero = ({ property }: PropertyDetailHeroProps) => {
 
               {/* Enquiry CTA */}
               <a
-                href={`mailto:info@harvard-taylor.com?subject=Enquiry: ${property.address}`}
+                href={`mailto:info@harvardandtaylor.com?subject=Enquiry: ${property.address}`}
                 className="flex items-center justify-center gap-2 bg-camel text-cream-light text-[12px] tracking-widest uppercase py-3.5 hover:bg-gold transition-colors duration-200 w-full rounded-sm"
                 style={{ fontFamily: "'Lato', sans-serif" }}
               >

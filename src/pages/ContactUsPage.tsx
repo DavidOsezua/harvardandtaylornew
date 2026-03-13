@@ -27,10 +27,10 @@ const LocationIcon = () => (
 );
 
 const contactDetails = [
-  { icon: <PhoneIcon />, label: "Phone Number", value: "07539 521124", href: "tel:07539521124" },
-  { icon: <EmailIcon />, label: "Email", value: "info@harvard-taylor.com", href: "mailto:info@harvard-taylor.com" },
-  { icon: <WhatsAppIcon />, label: "Whatsapp", value: "07334 146780", href: "https://wa.me/447334146780" },
-  { icon: <LocationIcon />, label: "Our Office", value: "153a Rye Lane,\nLondon,\nPeckham. SE15 4TL", href: null },
+  { icon: <PhoneIcon />, label: "Phone Number", value: "03330 506413", href: "tel:03330506413" },
+  { icon: <EmailIcon />, label: "Email", value: "info@harvardandtaylor.com", href: "mailto:info@harvardandtaylor.com" },
+  { icon: <WhatsAppIcon />, label: "Whatsapp", value: "07822 013391", href: "https://wa.me/447822013391" },
+  { icon: <LocationIcon />, label: "Our Office", value: "Office 110, 49-65\nSouthampton Way\nLondon\nSE5 7SW", href: null },
 ];
 
 const ContactUsPage = () => {
@@ -245,7 +245,7 @@ const ContactUsPage = () => {
                 </h2>
 
                 <a
-                  href="tel:07539521124"
+                  href="tel:03330506413"
                   className="inline-flex items-center gap-2.5 bg-white/95 text-dark/75 text-[13px] tracking-wide px-7 py-3 rounded-full hover:bg-white transition-colors duration-200"
                   style={{ fontFamily: "'Lato', sans-serif" }}
                 >
