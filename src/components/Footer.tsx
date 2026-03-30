@@ -180,7 +180,6 @@ const Footer = () => {
               <ul className="flex flex-col gap-3">
                 {[
                   { label: "Privacy Policy", to: "/privacy-policy" },
-                  { label: "Cookie Policy", to: "/privacy-policy" },
                   { label: "Terms & Conditions", to: "/terms" },
                 ].map(({ label, to }) => (
                   <li key={label}>
