@@ -1,21 +1,49 @@
-import { useMemo, useState } from "react";
-import { mockInquiries, type AdminInquiry, type InquiryStatus } from "../data/mockData";
+import { useEffect, useMemo, useState } from "react";
+import type { AdminInquiry, InquiryStatus } from "../types";
+import { listInquiries, updateInquiryStatus } from "../api/inquiries";
 
 const SearchIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.6"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <circle cx="11" cy="11" r="8" />
     <line x1="21" y1="21" x2="16.65" y2="16.65" />
   </svg>
 );
 
 const ChevronDown = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <polyline points="6 9 12 15 18 9" />
   </svg>
 );
 
 const ChevronUp = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <polyline points="18 15 12 9 6 15" />
   </svg>
 );
@@ -45,44 +73,74 @@ const formatDate = (iso: string) =>
   });
 
 const AdminInquiries = () => {
+  const [inquiries, setInquiries] = useState<AdminInquiry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [localStatuses, setLocalStatuses] = useState<Record<string, InquiryStatus>>({});
 
-  const inquiries: AdminInquiry[] = useMemo(() => {
-    return mockInquiries
-      .map((inq) => ({ ...inq, status: localStatuses[inq.id] ?? inq.status }))
-      .filter((inq) => {
-        if (statusFilter && inq.status !== statusFilter) return false;
-        if (search) {
-          const q = search.toLowerCase();
-          return (
-            inq.name.toLowerCase().includes(q) ||
-            inq.email.toLowerCase().includes(q) ||
-            inq.message.toLowerCase().includes(q) ||
-            (inq.propertyAddress?.toLowerCase().includes(q) ?? false)
-          );
-        }
-        return true;
+  useEffect(() => {
+    let cancelled = false;
+    listInquiries()
+      .then((data) => {
+        if (cancelled) return;
+        setInquiries(data);
       })
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }, [search, statusFilter, localStatuses]);
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        setError(
+          err instanceof Error ? err.message : "Failed to load Inquiries",
+        );
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-  const toggleExpand = (id: string) => {
-    setExpandedId((prev) => (prev === id ? null : id));
-    // auto-mark as read when opened
-    setLocalStatuses((prev) => {
-      const current = prev[id] ?? mockInquiries.find((i) => i.id === id)?.status;
-      if (current === "new") {
-        return { ...prev, [id]: "read" };
+  const filteredInquiries = useMemo(() => {
+    return inquiries.filter((inq) => {
+      if (statusFilter && inq.status !== statusFilter) return false;
+      if (search) {
+        const q = search.toLowerCase();
+        return (
+          inq.name.toLowerCase().includes(q) ||
+          inq.email.toLowerCase().includes(q) ||
+          inq.message.toLowerCase().includes(q) ||
+          (inq.propertyAddress?.toLowerCase().includes(q) ?? false)
+        );
       }
-      return prev;
+      return true;
     });
+  }, [inquiries, search, statusFilter]);
+
+  const toggleExpand = async (id: string) => {
+    setExpandedId((prev) => (prev === id ? null : id));
+    const target = inquiries.find((i) => i.id === id);
+    if (target && target.status === "new") {
+      try {
+        await updateInquiryStatus(id, "read");
+        setInquiries((prev) =>
+          prev.map((i) => (i.id === id ? { ...i, status: "read" } : i)),
+        );
+      } catch (err) {
+        console.error("Failed to mark as read", err);
+      }
+    }
   };
 
-  const setStatus = (id: string, status: InquiryStatus) => {
-    setLocalStatuses((prev) => ({ ...prev, [id]: status }));
+  const setStatus = async (id: string, status: InquiryStatus) => {
+    try {
+      await updateInquiryStatus(id, status);
+      setInquiries((prev) =>
+        prev.map((i) => (i.id === id ? { ...i, status } : i)),
+      );
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to update status.");
+    }
   };
 
   const newCount = inquiries.filter((i) => i.status === "new").length;
@@ -133,9 +191,28 @@ const AdminInquiries = () => {
         </select>
       </div>
 
+      {/* Error banner */}
+      {error && (
+        <div
+          className="mb-6 px-4 py-3 bg-red-50 border border-red-200 text-red-700 text-[12px] rounded-md"
+          style={{ fontFamily: "'Lato', sans-serif" }}
+        >
+          {error}
+        </div>
+      )}
+
       {/* Inquiry list */}
       <div className="bg-white border border-tan/20 rounded-lg overflow-hidden">
-        {inquiries.length === 0 ? (
+        {loading ? (
+          <div className="p-12 text-center">
+            <p
+              className="text-tan text-[12px] tracking-[0.2em] uppercase"
+              style={{ fontFamily: "'Lato', sans-serif" }}
+            >
+              Loading inquiries…
+            </p>
+          </div>
+        ) : filteredInquiries.length === 0 ? (
           <div className="p-12 text-center">
             <p
               className="text-tan text-[13px]"
@@ -146,7 +223,7 @@ const AdminInquiries = () => {
           </div>
         ) : (
           <ul className="divide-y divide-tan/15">
-            {inquiries.map((inq) => {
+            {filteredInquiries.map((inq) => {
               const isExpanded = expandedId === inq.id;
               const isUnread = inq.status === "new";
 
@@ -174,7 +251,9 @@ const AdminInquiries = () => {
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                         <p
                           className={`text-[14px] truncate ${
-                            isUnread ? "text-coffeeBrown" : "text-coffeeBrown/80"
+                            isUnread
+                              ? "text-coffeeBrown"
+                              : "text-coffeeBrown/80"
                           }`}
                           style={{ fontFamily: "'Inter', sans-serif" }}
                         >
@@ -195,7 +274,9 @@ const AdminInquiries = () => {
                       </p>
                       <p
                         className={`text-[12px] mt-1.5 ${
-                          isExpanded ? "text-dark/70" : "text-dark/60 line-clamp-1"
+                          isExpanded
+                            ? "text-dark/70"
+                            : "text-dark/60 line-clamp-1"
                         }`}
                         style={{ fontFamily: "'Inter', sans-serif" }}
                       >

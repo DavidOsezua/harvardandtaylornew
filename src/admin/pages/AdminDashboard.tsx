@@ -1,5 +1,8 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { mockProperties, mockInquiries } from "../data/mockData";
+import { listProperties } from "../api/properties";
+import { listInquiries } from "../api/inquiries";
+import type { AdminInquiry, AdminProperty } from "../types";
 
 const PageHeading = ({ title, subtitle }: { title: string; subtitle?: string }) => (
   <div className="mb-8">
@@ -72,16 +75,41 @@ const formatRelative = (iso: string) => {
 };
 
 const AdminDashboard = () => {
-  const totalProperties = mockProperties.length;
-  const publishedProperties = mockProperties.filter((p) => p.published).length;
-  const availableProperties = mockProperties.filter((p) => p.available && p.published).length;
-  const newInquiries = mockInquiries.filter((i) => i.status === "new").length;
+  const [properties, setProperties] = useState<AdminProperty[]>([]);
+  const [inquiries, setInquiries] = useState<AdminInquiry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const recentInquiries = [...mockInquiries]
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all([listProperties(), listInquiries()])
+      .then(([props, inqs]) => {
+        if (cancelled) return;
+        setProperties(props);
+        setInquiries(inqs);
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : "Failed to load dashboard data.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const totalProperties = properties.length;
+  const publishedProperties = properties.filter((p) => p.published).length;
+  const availableProperties = properties.filter((p) => p.available && p.published).length;
+  const newInquiries = inquiries.filter((i) => i.status === "new").length;
+
+  const recentInquiries = [...inquiries]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 4);
 
-  const recentProperties = [...mockProperties]
+  const recentProperties = [...properties]
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
     .slice(0, 4);
 
@@ -89,14 +117,23 @@ const AdminDashboard = () => {
     <div>
       <PageHeading title="Dashboard" subtitle="Welcome back. Here's what's happening." />
 
+      {error && (
+        <div
+          className="mb-6 px-4 py-3 bg-red-50 border border-red-200 text-red-700 text-[12px] rounded-md"
+          style={{ fontFamily: "'Lato', sans-serif" }}
+        >
+          {error}
+        </div>
+      )}
+
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
-        <KpiCard label="Total Listings" value={totalProperties} hint="All properties" accent="gold" />
-        <KpiCard label="Published" value={publishedProperties} hint="Visible on site" accent="coffee" />
-        <KpiCard label="Available Now" value={availableProperties} hint="Ready to view" accent="tan" />
+        <KpiCard label="Total Listings" value={loading ? "—" : totalProperties} hint="All properties" accent="gold" />
+        <KpiCard label="Published" value={loading ? "—" : publishedProperties} hint="Visible on site" accent="coffee" />
+        <KpiCard label="Available Now" value={loading ? "—" : availableProperties} hint="Ready to view" accent="tan" />
         <KpiCard
           label="New Inquiries"
-          value={newInquiries}
+          value={loading ? "—" : newInquiries}
           hint="Awaiting response"
           accent="gold"
         />
@@ -122,6 +159,21 @@ const AdminDashboard = () => {
             </Link>
           </div>
           <div className="flex flex-col divide-y divide-tan/15">
+            {loading ? (
+              <p
+                className="text-tan text-[11px] py-2"
+                style={{ fontFamily: "'Lato', sans-serif" }}
+              >
+                Loading…
+              </p>
+            ) : recentInquiries.length === 0 ? (
+              <p
+                className="text-tan text-[11px] py-2"
+                style={{ fontFamily: "'Lato', sans-serif" }}
+              >
+                No inquiries yet.
+              </p>
+            ) : null}
             {recentInquiries.map((inq) => (
               <div key={inq.id} className="py-3 first:pt-0 last:pb-0">
                 <div className="flex items-start justify-between gap-3">
@@ -179,6 +231,21 @@ const AdminDashboard = () => {
             </Link>
           </div>
           <div className="flex flex-col divide-y divide-tan/15">
+            {loading ? (
+              <p
+                className="text-tan text-[11px] py-2"
+                style={{ fontFamily: "'Lato', sans-serif" }}
+              >
+                Loading…
+              </p>
+            ) : recentProperties.length === 0 ? (
+              <p
+                className="text-tan text-[11px] py-2"
+                style={{ fontFamily: "'Lato', sans-serif" }}
+              >
+                No properties yet.
+              </p>
+            ) : null}
             {recentProperties.map((p) => (
               <Link
                 key={p.id}

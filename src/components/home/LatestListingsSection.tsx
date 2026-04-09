@@ -1,47 +1,33 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ListingCard, { type Listing } from "../ListingCard";
 import FadeIn from "../FadeIn";
-
-const mockListings: Listing[] = [
-  {
-    id: "1",
-    image: "/listings/listings1.webp",
-    badge: "FOR LET",
-    address: "Belmont Close, London, SW4",
-    beds: 3,
-    bathrooms: 2,
-    sqMeters: 120,
-    price: "6,500",
-    available: true,
-    slug: "belmont-close-london-sw4-1",
-  },
-  {
-    id: "2",
-    image: "/listings/listings2.webp",
-    badge: "FOR SALE",
-    address: "Old Brompton Road, London, SW5",
-    beds: 3,
-    bathrooms: 2,
-    sqMeters: 120,
-    price: "6,500",
-    available: true,
-    slug: "old-brompton-road-london-sw5",
-  },
-  {
-    id: "3",
-    image: "/listings/listings3.webp",
-    badge: "FOR LET",
-    address: "Belmont Close, London, SW4",
-    beds: 3,
-    bathrooms: 2,
-    sqMeters: 120,
-    price: "6,500",
-    available: true,
-    slug: "belmont-close-london-sw4-2",
-  },
-];
+import { listPublicProperties } from "../../lib/publicProperties";
 
 const LatestListingsSection = () => {
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    listPublicProperties()
+      .then((data) => {
+        if (cancelled) return;
+        setListings(data.slice(0, 3));
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : "Failed to load listings.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <section className="bg-cream py-14">
       <div className="max-w-7xl mx-auto px-6 md:px-8">
@@ -54,14 +40,40 @@ const LatestListingsSection = () => {
           Latest listings
         </h2>
 
-        {/* Cards grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockListings.map((listing, i) => (
-            <FadeIn key={listing.id} delay={i * 120}>
-              <ListingCard listing={listing} />
-            </FadeIn>
-          ))}
-        </div>
+        {loading ? (
+          <div className="py-16 text-center">
+            <p
+              className="text-tan text-[12px] tracking-[0.2em] uppercase"
+              style={{ fontFamily: "'Lato', sans-serif" }}
+            >
+              Loading listings…
+            </p>
+          </div>
+        ) : error ? (
+          <div
+            className="px-4 py-3 bg-red-50 border border-red-200 text-red-700 text-[13px] rounded-md"
+            style={{ fontFamily: "'Inter', sans-serif" }}
+          >
+            {error}
+          </div>
+        ) : listings.length === 0 ? (
+          <div className="py-16 text-center">
+            <p
+              className="text-tan text-[14px]"
+              style={{ fontFamily: "'Inter', sans-serif" }}
+            >
+              No listings available right now. Please check back soon.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {listings.map((listing, i) => (
+              <FadeIn key={listing.id} delay={i * 120}>
+                <ListingCard listing={listing} />
+              </FadeIn>
+            ))}
+          </div>
+        )}
 
         {/* View all button — bottom right */}
         <FadeIn delay={400} className="flex justify-end mt-8">

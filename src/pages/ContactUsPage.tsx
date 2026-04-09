@@ -1,4 +1,6 @@
+import { useState, type FormEvent } from "react";
 import FadeIn from "../components/FadeIn";
+import { createInquiry } from "../admin/api/inquiries";
 
 const PhoneIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -34,6 +36,45 @@ const contactDetails = [
 ];
 
 const ContactUsPage = () => {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    enquiryType: "",
+    message: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const updateField = (key: keyof typeof form, value: string) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+    try {
+      const enquiryLabel = form.enquiryType
+        ? form.enquiryType.charAt(0).toUpperCase() + form.enquiryType.slice(1)
+        : "General";
+      await createInquiry({
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        message: `[${enquiryLabel}] ${form.message}`,
+      });
+      setSubmitted(true);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Something went wrong. Please try again."
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <main>
       {/* ── Hero ── */}
@@ -98,78 +139,147 @@ const ContactUsPage = () => {
               Send an Enquiry
             </h2>
 
-            <form className="flex flex-col gap-5" onSubmit={(e) => e.preventDefault()}>
-              {[
-                { label: "Name", type: "text", placeholder: "Your Full Name", id: "name" },
-                { label: "Email", type: "email", placeholder: "Your email address", id: "email" },
-                { label: "Phone Number", type: "tel", placeholder: "Your phone number", id: "phone" },
-              ].map(({ label, type, placeholder, id }) => (
-                <div key={id} className="flex flex-col gap-1.5">
+            {submitted ? (
+              <div
+                className="border border-gold/40 bg-cream/60 px-6 py-10 text-center"
+                style={{ fontFamily: "'Inter', sans-serif" }}
+              >
+                <p
+                  className="text-gold text-[13px] tracking-[0.2em] uppercase mb-3"
+                  style={{ fontFamily: "'Lato', sans-serif" }}
+                >
+                  Message Received
+                </p>
+                <p className="text-dark/70 text-[15px] leading-relaxed">
+                  Thank you, {form.name || "we've got your enquiry"}. A member of our
+                  team will be in touch within 24 hours.
+                </p>
+              </div>
+            ) : (
+              <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+                <div className="flex flex-col gap-1.5">
                   <label
-                    htmlFor={id}
+                    htmlFor="name"
                     className="text-dark/60 text-[12px]"
                     style={{ fontFamily: "'Inter', sans-serif" }}
                   >
-                    {label}
+                    Name
                   </label>
                   <input
-                    id={id}
-                    type={type}
-                    placeholder={placeholder}
+                    id="name"
+                    type="text"
+                    required
+                    placeholder="Your Full Name"
+                    value={form.name}
+                    onChange={(e) => updateField("name", e.target.value)}
                     className="w-full border border-dark/15 bg-transparent px-3 py-2.5 text-[13px] text-dark/70 placeholder:text-dark/30 outline-none focus:border-gold transition-colors duration-200"
                     style={{ fontFamily: "'Inter', sans-serif" }}
                   />
                 </div>
-              ))}
 
-              {/* Enquiry Type */}
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="enquiry-type"
-                  className="text-dark/60 text-[12px]"
-                  style={{ fontFamily: "'Inter', sans-serif" }}
-                >
-                  Enquiry Type
-                </label>
-                <select
-                  id="enquiry-type"
-                  className="w-full border border-dark/15 bg-cream px-3 py-2.5 text-[13px] text-dark/60 outline-none focus:border-gold transition-colors duration-200 appearance-none cursor-pointer"
-                  style={{ fontFamily: "'Inter', sans-serif" }}
-                >
-                  <option value="">General Enquiry</option>
-                  <option value="lettings">Lettings</option>
-                  <option value="landlord">Landlord Services</option>
-                  <option value="tenant">Tenant Enquiry</option>
-                  <option value="valuation">Free Valuation</option>
-                </select>
-              </div>
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    htmlFor="email"
+                    className="text-dark/60 text-[12px]"
+                    style={{ fontFamily: "'Inter', sans-serif" }}
+                  >
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    required
+                    placeholder="Your email address"
+                    value={form.email}
+                    onChange={(e) => updateField("email", e.target.value)}
+                    className="w-full border border-dark/15 bg-transparent px-3 py-2.5 text-[13px] text-dark/70 placeholder:text-dark/30 outline-none focus:border-gold transition-colors duration-200"
+                    style={{ fontFamily: "'Inter', sans-serif" }}
+                  />
+                </div>
 
-              {/* Message */}
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="message"
-                  className="text-dark/60 text-[12px]"
-                  style={{ fontFamily: "'Inter', sans-serif" }}
-                >
-                  Message
-                </label>
-                <textarea
-                  id="message"
-                  rows={5}
-                  placeholder="Your Enquiry"
-                  className="w-full border border-dark/15 bg-transparent px-3 py-2.5 text-[13px] text-dark/70 placeholder:text-dark/30 outline-none focus:border-gold transition-colors duration-200 resize-none"
-                  style={{ fontFamily: "'Inter', sans-serif" }}
-                />
-              </div>
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    htmlFor="phone"
+                    className="text-dark/60 text-[12px]"
+                    style={{ fontFamily: "'Inter', sans-serif" }}
+                  >
+                    Phone Number
+                  </label>
+                  <input
+                    id="phone"
+                    type="tel"
+                    placeholder="Your phone number"
+                    value={form.phone}
+                    onChange={(e) => updateField("phone", e.target.value)}
+                    className="w-full border border-dark/15 bg-transparent px-3 py-2.5 text-[13px] text-dark/70 placeholder:text-dark/30 outline-none focus:border-gold transition-colors duration-200"
+                    style={{ fontFamily: "'Inter', sans-serif" }}
+                  />
+                </div>
 
-              <button
-                type="submit"
-                className="w-full bg-camel text-cream-light text-[13px] tracking-wide py-3.5 hover:bg-gold transition-colors duration-200 mt-1"
-                style={{ fontFamily: "'Lato', sans-serif" }}
-              >
-                Send Enquiry
-              </button>
-            </form>
+                {/* Enquiry Type */}
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    htmlFor="enquiry-type"
+                    className="text-dark/60 text-[12px]"
+                    style={{ fontFamily: "'Inter', sans-serif" }}
+                  >
+                    Enquiry Type
+                  </label>
+                  <select
+                    id="enquiry-type"
+                    value={form.enquiryType}
+                    onChange={(e) => updateField("enquiryType", e.target.value)}
+                    className="w-full border border-dark/15 bg-cream px-3 py-2.5 text-[13px] text-dark/60 outline-none focus:border-gold transition-colors duration-200 appearance-none cursor-pointer"
+                    style={{ fontFamily: "'Inter', sans-serif" }}
+                  >
+                    <option value="">General Enquiry</option>
+                    <option value="lettings">Lettings</option>
+                    <option value="landlord">Landlord Services</option>
+                    <option value="tenant">Tenant Enquiry</option>
+                    <option value="valuation">Free Valuation</option>
+                  </select>
+                </div>
+
+                {/* Message */}
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    htmlFor="message"
+                    className="text-dark/60 text-[12px]"
+                    style={{ fontFamily: "'Inter', sans-serif" }}
+                  >
+                    Message
+                  </label>
+                  <textarea
+                    id="message"
+                    rows={5}
+                    required
+                    placeholder="Your Enquiry"
+                    value={form.message}
+                    onChange={(e) => updateField("message", e.target.value)}
+                    className="w-full border border-dark/15 bg-transparent px-3 py-2.5 text-[13px] text-dark/70 placeholder:text-dark/30 outline-none focus:border-gold transition-colors duration-200 resize-none"
+                    style={{ fontFamily: "'Inter', sans-serif" }}
+                  />
+                </div>
+
+                {error && (
+                  <p
+                    className="text-red-600 text-[12px]"
+                    style={{ fontFamily: "'Inter', sans-serif" }}
+                  >
+                    {error}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full bg-camel text-cream-light text-[13px] tracking-wide py-3.5 hover:bg-gold transition-colors duration-200 mt-1 disabled:opacity-60 disabled:cursor-not-allowed"
+                  style={{ fontFamily: "'Lato', sans-serif" }}
+                >
+                  {submitting ? "Sending…" : "Send Enquiry"}
+                </button>
+              </form>
+            )}
           </FadeIn>
 
           {/* Right — contact details */}

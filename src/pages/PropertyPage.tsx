@@ -3,126 +3,10 @@ import PropertyHeroSection from "../components/properties/PropertyHeroSection";
 import PropertyListingCard, { type PropertyListing } from "../components/properties/PropertyListingCard";
 import ListingCard, { type Listing } from "../components/ListingCard";
 import type { Filters } from "../components/properties/PropertyHeroSection";
-
-// Horizontal slider listings
-const sliderListings: PropertyListing[] = [
-  {
-    id: "s1",
-    image: "/listings/listings1.webp",
-    status: "LET AGREED",
-    available: true,
-    address: "Belmont Close, London, SW4",
-    beds: 1,
-    bathrooms: 2,
-    dimensions: "10 X 10",
-    price: "6,500",
-    slug: "belmont-close-london-sw4-1",
-  },
-  {
-    id: "s2",
-    image: "/listings/listings2.webp",
-    status: "FOR SALE",
-    available: true,
-    address: "Old Brompton Road, London, SW5",
-    beds: 3,
-    bathrooms: 2,
-    dimensions: "12 X 14",
-    price: "6,500",
-    slug: "old-brompton-road-london-sw5",
-  },
-  {
-    id: "s3",
-    image: "/listings/listings3.webp",
-    status: "AVAILABLE",
-    available: true,
-    address: "Belmont Close, London, SW4",
-    beds: 3,
-    bathrooms: 2,
-    dimensions: "10 X 10",
-    price: "6,500",
-    slug: "belmont-close-london-sw4-2",
-  },
-];
-
-// Grid card listings (above slider)
-const topGridListings: Listing[] = [
-  {
-    id: "t1",
-    image: "/listings/listings1.webp",
-    badge: "FOR LET",
-    address: "Belmont Close, London, SW4",
-    beds: 3,
-    bathrooms: 2,
-    sqMeters: 120,
-    price: "6,500",
-    available: true,
-    slug: "belmont-close-london-sw4-1",
-  },
-  {
-    id: "t2",
-    image: "/listings/listings2.webp",
-    badge: "FOR SALE",
-    address: "Old Brompton Road, London, SW5",
-    beds: 3,
-    bathrooms: 2,
-    sqMeters: 120,
-    price: "6,500",
-    available: true,
-    slug: "old-brompton-road-london-sw5",
-  },
-  {
-    id: "t3",
-    image: "/listings/listings3.webp",
-    badge: "FOR LET",
-    address: "Belmont Close, London, SW4",
-    beds: 3,
-    bathrooms: 2,
-    sqMeters: 120,
-    price: "6,500",
-    available: true,
-    slug: "belmont-close-london-sw4-2",
-  },
-];
-
-// Grid card listings (below slider)
-const bottomGridListings: Listing[] = [
-  {
-    id: "b1",
-    image: "/listings/listings3.webp",
-    badge: "FOR LET",
-    address: "Clapham Manor Street, London, SW4",
-    beds: 2,
-    bathrooms: 1,
-    sqMeters: 85,
-    price: "3,200",
-    available: true,
-    slug: "clapham-manor-street-sw4",
-  },
-  {
-    id: "b2",
-    image: "/listings/listings1.webp",
-    badge: "FOR SALE",
-    address: "Landor Road, London, SW9",
-    beds: 4,
-    bathrooms: 3,
-    sqMeters: 200,
-    price: "8,000",
-    available: false,
-    slug: "landor-road-london-sw9",
-  },
-  {
-    id: "b3",
-    image: "/listings/listings2.webp",
-    badge: "FOR LET",
-    address: "Acre Lane, Brixton, SW2",
-    beds: 1,
-    bathrooms: 1,
-    sqMeters: 55,
-    price: "2,100",
-    available: true,
-    slug: "acre-lane-brixton-sw2",
-  },
-];
+import {
+  listPublicProperties,
+  listPublicPropertyListings,
+} from "../lib/publicProperties";
 
 const ChevronLeft = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -159,8 +43,41 @@ const PropertyPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [visible, setVisible] = useState(true);
 
+  const [allListings, setAllListings] = useState<Listing[]>([]);
+  const [allSliderListings, setAllSliderListings] = useState<PropertyListing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all([listPublicProperties(), listPublicPropertyListings()])
+      .then(([listings, sliderItems]) => {
+        if (cancelled) return;
+        setAllListings(listings);
+        setAllSliderListings(sliderItems);
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : "Failed to load properties.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Split listings into top grid (first 3), slider source (next 3), bottom grid (rest).
+  const topGridListings = useMemo(() => allListings.slice(0, 3), [allListings]);
+  const bottomGridListings = useMemo(() => allListings.slice(6), [allListings]);
+  const sliderSource = useMemo(
+    () => allSliderListings.slice(3, 6),
+    [allSliderListings],
+  );
+
   const filteredSlider = useMemo(() => {
-    return sliderListings.filter((l) => {
+    return sliderSource.filter((l) => {
       const price = parseInt(l.price.replace(/,/g, ""), 10);
       if (activeFilters.minRent && price < parseInt(activeFilters.minRent)) return false;
       if (activeFilters.maxRent && price > parseInt(activeFilters.maxRent)) return false;
@@ -173,7 +90,7 @@ const PropertyPage = () => {
       }
       return true;
     });
-  }, [activeFilters]);
+  }, [sliderSource, activeFilters]);
 
   useEffect(() => {
     setCurrentIndex(0);
@@ -194,7 +111,41 @@ const PropertyPage = () => {
     <main>
       <PropertyHeroSection onSearch={setActiveFilters} />
 
+      {error && (
+        <div className="bg-cream px-6 md:px-10 py-6">
+          <div
+            className="max-w-7xl mx-auto px-4 py-3 bg-red-50 border border-red-200 text-red-700 text-[13px] rounded-md"
+            style={{ fontFamily: "'Inter', sans-serif" }}
+          >
+            {error}
+          </div>
+        </div>
+      )}
+
+      {loading && (
+        <div className="bg-cream py-14 text-center">
+          <p
+            className="text-tan text-[12px] tracking-[0.2em] uppercase"
+            style={{ fontFamily: "'Lato', sans-serif" }}
+          >
+            Loading properties…
+          </p>
+        </div>
+      )}
+
+      {!loading && allListings.length === 0 && !error && (
+        <div className="bg-cream py-20 text-center">
+          <p
+            className="text-tan text-[14px]"
+            style={{ fontFamily: "'Inter', sans-serif" }}
+          >
+            No properties available right now. Please check back soon.
+          </p>
+        </div>
+      )}
+
       {/* ── Top grid section ── */}
+      {!loading && topGridListings.length > 0 && (
       <section className="bg-cream py-14">
         <div className="max-w-7xl mx-auto px-6 md:px-8">
           <SectionHeading title="Available Properties" />
@@ -205,8 +156,10 @@ const PropertyPage = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* ── Latest Listings slider ── */}
+      {!loading && sliderSource.length > 0 && (
       <section className="bg-offWhite py-14">
         <div className="max-w-5xl mx-auto px-6 md:px-8">
 
@@ -281,8 +234,10 @@ const PropertyPage = () => {
           )}
         </div>
       </section>
+      )}
 
       {/* ── Bottom grid section ── */}
+      {!loading && bottomGridListings.length > 0 && (
       <section className="bg-cream py-14">
         <div className="max-w-7xl mx-auto px-6 md:px-8">
           <SectionHeading title="More Listings" />
@@ -293,6 +248,7 @@ const PropertyPage = () => {
           </div>
         </div>
       </section>
+      )}
     </main>
   );
 };

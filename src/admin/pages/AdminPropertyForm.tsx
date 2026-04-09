@@ -134,7 +134,22 @@ const AdminPropertyForm = () => {
 
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [pendingPreviews, setPendingPreviews] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const pendingPreviewsRef = useRef<string[]>([]);
+
+  // Track latest previews so the unmount cleanup can revoke them.
+  useEffect(() => {
+    pendingPreviewsRef.current = pendingPreviews;
+  }, [pendingPreviews]);
+
+  // Revoke any leftover object URLs when the form unmounts.
+  useEffect(() => {
+    return () => {
+      pendingPreviewsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, []);
 
   useEffect(() => {
     if (!id) {
@@ -205,37 +220,34 @@ const AdminPropertyForm = () => {
     update("features", form.features.filter((f) => f !== feature));
   };
 
-  const handleFiles = async (fileList: FileList | null) => {
+  const handleFiles = (fileList: FileList | null) => {
     if (!fileList || fileList.length === 0) return;
-    if (!id) {
-      alert("Save the property first before uploading images.");
-      return;
-    }
+    const files = Array.from(fileList).filter((f) => f.type.startsWith("image/"));
+    if (files.length === 0) return;
 
-    setUploading(true);
-    setError(null);
-    try {
-      const files = Array.from(fileList).filter((f) => f.type.startsWith("image/"));
-      for (const file of files) {
-        const uploaded = await uploadPropertyImage(id, file);
-        setImages((prev) => [...prev, uploaded]);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to upload image.");
-    } finally {
-      setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
+    const previews = files.map((f) => URL.createObjectURL(f));
+    setPendingFiles((prev) => [...prev, ...files]);
+    setPendingPreviews((prev) => [...prev, ...previews]);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleFileInput = (e: ChangeEvent<HTMLInputElement>) => {
-    void handleFiles(e.target.files);
+    handleFiles(e.target.files);
   };
 
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragOver(false);
-    void handleFiles(e.dataTransfer.files);
+    handleFiles(e.dataTransfer.files);
+  };
+
+  const removePendingFile = (index: number) => {
+    setPendingFiles((prev) => prev.filter((_, i) => i !== index));
+    setPendingPreviews((prev) => {
+      const url = prev[index];
+      if (url) URL.revokeObjectURL(url);
+      return prev.filter((_, i) => i !== index);
+    });
   };
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
@@ -262,17 +274,32 @@ const AdminPropertyForm = () => {
     setError(null);
     try {
       const input = toPropertyInput(form);
+      let propertyId: string;
       if (isEdit && id) {
         await updateProperty(id, input);
-        navigate("/admin/properties");
+        propertyId = id;
       } else {
         const created = await createProperty(input);
-        // Redirect to edit so the user can now upload images
-        navigate(`/admin/properties/${created.id}/edit`, { replace: true });
+        propertyId = created.id;
       }
+
+      // Upload any staged images now that we have a property id.
+      if (pendingFiles.length > 0) {
+        setUploading(true);
+        for (const file of pendingFiles) {
+          await uploadPropertyImage(propertyId, file);
+        }
+        pendingPreviews.forEach((url) => URL.revokeObjectURL(url));
+        setPendingFiles([]);
+        setPendingPreviews([]);
+        setUploading(false);
+      }
+
+      navigate("/admin/properties");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save property.");
       setSaving(false);
+      setUploading(false);
     }
   };
 
@@ -496,55 +523,44 @@ const AdminPropertyForm = () => {
 
           {/* Images */}
           <SectionCard title="Images">
-            {!isEdit ? (
-              <div className="border-2 border-dashed border-tan/30 rounded-lg p-8 text-center bg-cream/30">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFileInput}
+              className="hidden"
+            />
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
+                dragOver
+                  ? "border-gold bg-gold/5"
+                  : "border-tan/30 bg-cream/30 hover:border-gold/50"
+              } ${uploading ? "opacity-60 pointer-events-none" : ""}`}
+            >
+              <div className="flex flex-col items-center gap-2 text-tan">
+                <UploadIcon />
+                <p className="text-[12px]" style={{ fontFamily: "'Lato', sans-serif" }}>
+                  {uploading
+                    ? "Uploading…"
+                    : "Drag & drop images here, or click to browse"}
+                </p>
                 <p
-                  className="text-[12px] text-tan"
+                  className="text-[10px] text-tan/60"
                   style={{ fontFamily: "'Lato', sans-serif" }}
                 >
-                  Save the property first, then come back to upload images.
+                  The first image is used as the cover.
+                  {pendingFiles.length > 0 &&
+                    ` ${pendingFiles.length} pending — uploads on save.`}
                 </p>
               </div>
-            ) : (
-              <>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleFileInput}
-                  className="hidden"
-                />
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  onDrop={handleDrop}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
-                    dragOver
-                      ? "border-gold bg-gold/5"
-                      : "border-tan/30 bg-cream/30 hover:border-gold/50"
-                  } ${uploading ? "opacity-60 pointer-events-none" : ""}`}
-                >
-                  <div className="flex flex-col items-center gap-2 text-tan">
-                    <UploadIcon />
-                    <p className="text-[12px]" style={{ fontFamily: "'Lato', sans-serif" }}>
-                      {uploading
-                        ? "Uploading…"
-                        : "Drag & drop images here, or click to browse"}
-                    </p>
-                    <p
-                      className="text-[10px] text-tan/60"
-                      style={{ fontFamily: "'Lato', sans-serif" }}
-                    >
-                      The first image is used as the cover
-                    </p>
-                  </div>
-                </div>
-              </>
-            )}
+            </div>
 
-            {images.length > 0 && (
+            {(images.length > 0 || pendingPreviews.length > 0) && (
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-5">
                 {images.map((img, idx) => (
                   <div
@@ -565,6 +581,36 @@ const AdminPropertyForm = () => {
                       onClick={() => removeImage(img)}
                       className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center bg-white/90 text-tan hover:text-red-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                       aria-label="Remove image"
+                    >
+                      <XIcon />
+                    </button>
+                  </div>
+                ))}
+                {pendingPreviews.map((url, idx) => (
+                  <div
+                    key={`pending-${idx}`}
+                    className="relative aspect-[4/3] rounded-md overflow-hidden bg-cream group"
+                  >
+                    <img src={url} alt="" className="w-full h-full object-cover" />
+                    {!isEdit && idx === 0 && images.length === 0 && (
+                      <span
+                        className="absolute top-2 left-2 px-2 py-0.5 text-[9px] tracking-widest uppercase bg-white/90 text-gold rounded-full"
+                        style={{ fontFamily: "'Lato', sans-serif" }}
+                      >
+                        Cover
+                      </span>
+                    )}
+                    <span
+                      className="absolute bottom-2 left-2 px-2 py-0.5 text-[9px] tracking-widest uppercase bg-coffeeBrown/85 text-cream rounded-full"
+                      style={{ fontFamily: "'Lato', sans-serif" }}
+                    >
+                      Pending
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removePendingFile(idx)}
+                      className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center bg-white/90 text-tan hover:text-red-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      aria-label="Remove pending image"
                     >
                       <XIcon />
                     </button>
