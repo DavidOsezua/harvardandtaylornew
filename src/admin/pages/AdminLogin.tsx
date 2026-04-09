@@ -95,7 +95,7 @@ const AdminLogin = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@harvardandtaylor.com"
+                placeholder="you@example.com"
                 className="w-full px-4 py-3 bg-cream/50 border border-tan/30 rounded-md text-[14px] text-coffeeBrown placeholder:text-tan/50 focus:outline-none focus:border-gold focus:bg-white transition-colors"
               />
             </div>
@@ -142,18 +142,6 @@ const AdminLogin = () => {
             </button>
           </form>
 
-          {/* Mock notice — remove once Supabase is wired */}
-          <div className="mt-8 pt-6 border-t border-tan/20">
-            <p
-              className="text-[10px] text-tan/80 text-center leading-relaxed"
-              style={{ fontFamily: "'Lato', sans-serif" }}
-            >
-              MOCK MODE — use{" "}
-              <span className="text-coffeeBrown">admin@harvardandtaylor.com</span>
-              {" / "}
-              <span className="text-coffeeBrown">admin123</span>
-            </p>
-          </div>
         </div>
 
         {/* Back to site */}

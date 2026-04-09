@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { mockProperties, type AdminProperty, type PropertyStatus } from "../data/mockData";
+import type { AdminProperty, PropertyStatus } from "../types";
+import { deleteProperty, listProperties } from "../api/properties";
 import PropertyDetailsModal from "../components/PropertyDetailsModal";
 
 const PlusIcon = () => (
@@ -71,20 +72,63 @@ const PublishedDot = ({ published }: { published: boolean }) => (
 );
 
 const AdminProperties = () => {
+  const [properties, setProperties] = useState<AdminProperty[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [publishedFilter, setPublishedFilter] = useState<string>("");
   const [selectedProperty, setSelectedProperty] = useState<AdminProperty | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    listProperties()
+      .then((rows) => {
+        if (cancelled) return;
+        setProperties(rows);
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : "Failed to load properties.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleDelete = async (p: AdminProperty) => {
+    const confirmed = window.confirm(
+      `Delete "${p.address}"? This permanently removes the listing and all of its images.`
+    );
+    if (!confirmed) return;
+
+    setDeletingId(p.id);
+    try {
+      await deleteProperty(p.id);
+      setProperties((prev) => prev.filter((x) => x.id !== p.id));
+      if (selectedProperty?.id === p.id) setSelectedProperty(null);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to delete property.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const filtered: AdminProperty[] = useMemo(() => {
-    return mockProperties.filter((p) => {
+    return properties.filter((p) => {
       if (search && !p.address.toLowerCase().includes(search.toLowerCase())) return false;
       if (statusFilter && p.status !== statusFilter) return false;
       if (publishedFilter === "published" && !p.published) return false;
       if (publishedFilter === "draft" && p.published) return false;
       return true;
     });
-  }, [search, statusFilter, publishedFilter]);
+  }, [properties, search, statusFilter, publishedFilter]);
 
   return (
     <div>
@@ -101,7 +145,9 @@ const AdminProperties = () => {
             className="text-tan text-[12px] tracking-wide mt-1"
             style={{ fontFamily: "'Lato', sans-serif" }}
           >
-            {filtered.length} of {mockProperties.length} listings
+            {loading
+              ? "Loading…"
+              : `${filtered.length} of ${properties.length} listings`}
           </p>
         </div>
         <Link
@@ -154,7 +200,32 @@ const AdminProperties = () => {
         </select>
       </div>
 
+      {/* Error banner */}
+      {error && (
+        <div
+          className="mb-6 px-4 py-3 bg-red-50 border border-red-200 text-red-700 text-[12px] rounded-md"
+          style={{ fontFamily: "'Lato', sans-serif" }}
+        >
+          {error}
+        </div>
+      )}
+
+      {/* Loading state */}
+      {loading && (
+        <div className="bg-white border border-tan/20 rounded-lg p-12 text-center">
+          <p
+            className="text-tan text-[12px] tracking-[0.2em] uppercase"
+            style={{ fontFamily: "'Lato', sans-serif" }}
+          >
+            Loading properties…
+          </p>
+        </div>
+      )}
+
       {/* Table (desktop) */}
+      {!loading && (
+        <>
+
       <div className="hidden lg:block bg-white border border-tan/20 rounded-lg overflow-hidden">
         <table className="w-full">
           <thead>
@@ -253,7 +324,9 @@ const AdminProperties = () => {
                       </Link>
                       <button
                         type="button"
-                        className="p-2 text-tan hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                        onClick={() => handleDelete(p)}
+                        disabled={deletingId === p.id}
+                        className="p-2 text-tan hover:text-red-600 hover:bg-red-50 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Delete"
                       >
                         <TrashIcon />
@@ -339,7 +412,9 @@ const AdminProperties = () => {
                   </Link>
                   <button
                     type="button"
-                    className="text-[10px] tracking-widest uppercase text-red-600 border border-red-200 rounded-full px-3 py-1 hover:bg-red-50 transition-colors"
+                    onClick={() => handleDelete(p)}
+                    disabled={deletingId === p.id}
+                    className="text-[10px] tracking-widest uppercase text-red-600 border border-red-200 rounded-full px-3 py-1 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{ fontFamily: "'Lato', sans-serif" }}
                   >
                     Delete
@@ -350,6 +425,8 @@ const AdminProperties = () => {
           ))
         )}
       </div>
+        </>
+      )}
 
       {/* Details modal */}
       <PropertyDetailsModal

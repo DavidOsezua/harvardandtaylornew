@@ -1,6 +1,14 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type DragEvent, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { mockProperties, type PropertyStatus } from "../data/mockData";
+import type { PropertyImage, PropertyInput, PropertyStatus } from "../types";
+import {
+  createProperty,
+  deletePropertyImage,
+  getProperty,
+  listPropertyImages,
+  updateProperty,
+  uploadPropertyImage,
+} from "../api/properties";
 
 const ChevronLeft = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -50,7 +58,6 @@ interface FormState {
   price: string;
   description: string;
   features: string[];
-  images: string[];
 }
 
 const emptyForm: FormState = {
@@ -65,8 +72,27 @@ const emptyForm: FormState = {
   price: "",
   description: "",
   features: [],
-  images: [],
 };
+
+const descriptionToArray = (text: string): string[] =>
+  text
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+const toPropertyInput = (form: FormState): PropertyInput => ({
+  address: form.address.trim(),
+  slug: form.slug.trim(),
+  status: form.status,
+  available: form.available,
+  published: form.published,
+  beds: Number.parseInt(form.beds, 10) || 0,
+  bathrooms: Number.parseInt(form.bathrooms, 10) || 0,
+  dimensions: form.dimensions.trim(),
+  price: form.price.trim(),
+  description: descriptionToArray(form.description),
+  features: form.features,
+});
 
 const Label = ({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) => (
   <label
@@ -99,27 +125,59 @@ const AdminPropertyForm = () => {
   const isEdit = Boolean(id);
 
   const [form, setForm] = useState<FormState>(emptyForm);
+  const [images, setImages] = useState<PropertyImage[]>([]);
   const [featureInput, setFeatureInput] = useState("");
 
+  const [loading, setLoading] = useState(isEdit);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
-    if (!id) return;
-    const existing = mockProperties.find((p) => p.id === id);
-    if (existing) {
-      setForm({
-        address: existing.address,
-        slug: existing.slug,
-        status: existing.status,
-        available: existing.available,
-        published: existing.published,
-        beds: String(existing.beds),
-        bathrooms: String(existing.bathrooms),
-        dimensions: existing.dimensions,
-        price: existing.price,
-        description: existing.description.join("\n\n"),
-        features: existing.features,
-        images: existing.images,
-      });
+    if (!id) {
+      setLoading(false);
+      return;
     }
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    Promise.all([getProperty(id), listPropertyImages(id)])
+      .then(([property, imgs]) => {
+        if (cancelled) return;
+        if (!property) {
+          setError("Property not found.");
+          return;
+        }
+        setForm({
+          address: property.address,
+          slug: property.slug,
+          status: property.status,
+          available: property.available,
+          published: property.published,
+          beds: String(property.beds),
+          bathrooms: String(property.bathrooms),
+          dimensions: property.dimensions,
+          price: property.price,
+          description: property.description.join("\n\n"),
+          features: property.features,
+        });
+        setImages(imgs);
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : "Failed to load property.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) => {
@@ -147,16 +205,75 @@ const AdminPropertyForm = () => {
     update("features", form.features.filter((f) => f !== feature));
   };
 
-  const removeImage = (idx: number) => {
-    update("images", form.images.filter((_, i) => i !== idx));
+  const handleFiles = async (fileList: FileList | null) => {
+    if (!fileList || fileList.length === 0) return;
+    if (!id) {
+      alert("Save the property first before uploading images.");
+      return;
+    }
+
+    setUploading(true);
+    setError(null);
+    try {
+      const files = Array.from(fileList).filter((f) => f.type.startsWith("image/"));
+      for (const file of files) {
+        const uploaded = await uploadPropertyImage(id, file);
+        setImages((prev) => [...prev, uploaded]);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to upload image.");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleFileInput = (e: ChangeEvent<HTMLInputElement>) => {
+    void handleFiles(e.target.files);
+  };
+
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    // Mock — just log and navigate back
-    console.log("Submit (mock):", form);
-    alert(`(Mock) Property ${isEdit ? "updated" : "created"}.\nWill persist to Supabase once wired.`);
-    navigate("/admin/properties");
+    setDragOver(false);
+    void handleFiles(e.dataTransfer.files);
+  };
+
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (!dragOver) setDragOver(true);
+  };
+
+  const handleDragLeave = () => setDragOver(false);
+
+  const removeImage = async (image: PropertyImage) => {
+    const confirmed = window.confirm("Remove this image?");
+    if (!confirmed) return;
+    try {
+      await deletePropertyImage(image.id, image.url);
+      setImages((prev) => prev.filter((img) => img.id !== image.id));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to delete image.");
+    }
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+    try {
+      const input = toPropertyInput(form);
+      if (isEdit && id) {
+        await updateProperty(id, input);
+        navigate("/admin/properties");
+      } else {
+        const created = await createProperty(input);
+        // Redirect to edit so the user can now upload images
+        navigate(`/admin/properties/${created.id}/edit`, { replace: true });
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save property.");
+      setSaving(false);
+    }
   };
 
   return (
@@ -180,6 +297,25 @@ const AdminPropertyForm = () => {
         </h1>
       </div>
 
+      {error && (
+        <div
+          className="mb-6 px-4 py-3 bg-red-50 border border-red-200 text-red-700 text-[12px] rounded-md"
+          style={{ fontFamily: "'Lato', sans-serif" }}
+        >
+          {error}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="bg-white border border-tan/20 rounded-lg p-12 text-center">
+          <p
+            className="text-tan text-[12px] tracking-[0.2em] uppercase"
+            style={{ fontFamily: "'Lato', sans-serif" }}
+          >
+            Loading property…
+          </p>
+        </div>
+      ) : (
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* ─── Left column ─── */}
         <div className="lg:col-span-2 flex flex-col gap-6">
@@ -360,29 +496,62 @@ const AdminPropertyForm = () => {
 
           {/* Images */}
           <SectionCard title="Images">
-            <div className="border-2 border-dashed border-tan/30 rounded-lg p-8 text-center bg-cream/30 hover:border-gold/50 transition-colors cursor-not-allowed opacity-80">
-              <div className="flex flex-col items-center gap-2 text-tan">
-                <UploadIcon />
-                <p className="text-[12px]" style={{ fontFamily: "'Lato', sans-serif" }}>
-                  Drag &amp; drop images here, or click to browse
-                </p>
+            {!isEdit ? (
+              <div className="border-2 border-dashed border-tan/30 rounded-lg p-8 text-center bg-cream/30">
                 <p
-                  className="text-[10px] text-tan/60"
+                  className="text-[12px] text-tan"
                   style={{ fontFamily: "'Lato', sans-serif" }}
                 >
-                  (Upload wired up after Supabase setup)
+                  Save the property first, then come back to upload images.
                 </p>
               </div>
-            </div>
+            ) : (
+              <>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleFileInput}
+                  className="hidden"
+                />
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
+                    dragOver
+                      ? "border-gold bg-gold/5"
+                      : "border-tan/30 bg-cream/30 hover:border-gold/50"
+                  } ${uploading ? "opacity-60 pointer-events-none" : ""}`}
+                >
+                  <div className="flex flex-col items-center gap-2 text-tan">
+                    <UploadIcon />
+                    <p className="text-[12px]" style={{ fontFamily: "'Lato', sans-serif" }}>
+                      {uploading
+                        ? "Uploading…"
+                        : "Drag & drop images here, or click to browse"}
+                    </p>
+                    <p
+                      className="text-[10px] text-tan/60"
+                      style={{ fontFamily: "'Lato', sans-serif" }}
+                    >
+                      The first image is used as the cover
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
 
-            {form.images.length > 0 && (
+            {images.length > 0 && (
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-5">
-                {form.images.map((img, idx) => (
+                {images.map((img, idx) => (
                   <div
-                    key={`${img}-${idx}`}
+                    key={img.id}
                     className="relative aspect-[4/3] rounded-md overflow-hidden bg-cream group"
                   >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
+                    <img src={img.url} alt="" className="w-full h-full object-cover" />
                     {idx === 0 && (
                       <span
                         className="absolute top-2 left-2 px-2 py-0.5 text-[9px] tracking-widest uppercase bg-white/90 text-gold rounded-full"
@@ -393,7 +562,7 @@ const AdminPropertyForm = () => {
                     )}
                     <button
                       type="button"
-                      onClick={() => removeImage(idx)}
+                      onClick={() => removeImage(img)}
                       className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center bg-white/90 text-tan hover:text-red-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                       aria-label="Remove image"
                     >
@@ -463,10 +632,11 @@ const AdminPropertyForm = () => {
           <div className="bg-white border border-tan/20 rounded-lg p-6 flex flex-col gap-3">
             <button
               type="submit"
-              className="w-full inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-[11px] tracking-[0.2em] uppercase font-light bg-camel text-cream-light hover:bg-gold transition-colors duration-200"
+              disabled={saving}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-[11px] tracking-[0.2em] uppercase font-light bg-camel text-cream-light hover:bg-gold transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
               style={{ fontFamily: "'Lato', sans-serif" }}
             >
-              {isEdit ? "Save Changes" : "Create Property"}
+              {saving ? "Saving…" : isEdit ? "Save Changes" : "Create Property"}
             </button>
             <Link
               to="/admin/properties"
@@ -478,6 +648,7 @@ const AdminPropertyForm = () => {
           </div>
         </div>
       </form>
+      )}
     </div>
   );
 };

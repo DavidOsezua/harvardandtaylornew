@@ -1,63 +1,58 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-
-/**
- * Mock auth context — to be replaced with Supabase auth once the project is set up.
- * Persists a fake "session" in localStorage so refresh keeps you logged in.
- */
-
-interface AdminUser {
-  email: string;
-}
+import type { Session, User } from "@supabase/supabase-js";
+import { supabase } from "../../lib/supabaseClient";
 
 interface AuthContextValue {
-  user: AdminUser | null;
+  user: User | null;
+  session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
-  signOut: () => void;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-const STORAGE_KEY = "ht_admin_mock_session";
-
-// TEMP — anything works while we mock. We'll wire to Supabase next.
-const MOCK_EMAIL = "admin@harvardandtaylor.com";
-const MOCK_PASSWORD = "admin123";
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<AdminUser | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setUser(JSON.parse(raw));
-    } catch {
-      // ignore
-    }
-    setLoading(false);
+    // Hydrate from existing session on mount
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setUser(data.session?.user ?? null);
+      setLoading(false);
+    });
+
+    // Subscribe to auth state changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    // simulate network latency
-    await new Promise((r) => setTimeout(r, 500));
-
-    if (email.trim().toLowerCase() !== MOCK_EMAIL || password !== MOCK_PASSWORD) {
-      return { error: "Invalid email or password." };
-    }
-    const next = { email: email.trim().toLowerCase() };
-    setUser(next);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    });
+    if (error) return { error: error.message };
     return { error: null };
   };
 
-  const signOut = () => {
-    setUser(null);
-    localStorage.removeItem(STORAGE_KEY);
+  const signOut = async () => {
+    await supabase.auth.signOut();
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
