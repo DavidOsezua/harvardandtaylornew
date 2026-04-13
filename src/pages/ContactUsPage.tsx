@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useLocation } from "react-router-dom";
 import FadeIn from "../components/FadeIn";
 import { createInquiry } from "../admin/api/inquiries";
 
@@ -36,12 +37,18 @@ const contactDetails = [
 ];
 
 const ContactUsPage = () => {
+  const location = useLocation();
+  const prefillAddress = (location.state as { propertyAddress?: string } | null)
+    ?.propertyAddress;
+
   const [form, setForm] = useState({
     name: "",
     email: "",
     phone: "",
-    enquiryType: "",
-    message: "",
+    enquiryType: prefillAddress ? "lettings" : "",
+    message: prefillAddress
+      ? `I would like to enquire about the property at ${prefillAddress}.\n\n`
+      : "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);

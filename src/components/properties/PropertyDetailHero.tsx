@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 interface PropertyDetail {
   images: string[];
@@ -260,7 +261,7 @@ const PropertyDetailHero = ({ property }: PropertyDetailHeroProps) => {
                   </button>
                 )}
 
-                {[
+                {/* {[
                   { icon: <View3DIcon />, label: "3D View" },
                   { icon: <FeaturesIcon />, label: "Features" },
                 ].map(({ icon, label }) => (
@@ -272,17 +273,18 @@ const PropertyDetailHero = ({ property }: PropertyDetailHeroProps) => {
                   >
                     {icon}
                   </button>
-                ))}
+                ))} */}
               </div>
 
               {/* Enquiry CTA */}
-              <a
-                href={`mailto:info@harvardandtaylor.com?subject=Enquiry: ${property.address}`}
+              <Link
+                to="/contact"
+                state={{ propertyAddress: property.address }}
                 className="flex items-center justify-center gap-2 bg-camel text-cream-light text-[12px] tracking-widest uppercase py-3.5 hover:bg-gold transition-colors duration-200 w-full rounded-sm"
                 style={{ fontFamily: "'Lato', sans-serif" }}
               >
                 Make an Enquiry <EnquiryIcon />
-              </a>
+              </Link>
             </div>
           </div>
 

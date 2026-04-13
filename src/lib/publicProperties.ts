@@ -110,6 +110,7 @@ async function fetchPublicPropertyRows(): Promise<PropertyRowWithImages[]> {
   const { data, error } = await supabase
     .from("properties")
     .select("*, property_images(url, sort_order)")
+    .eq("published", true)
     .order("updated_at", { ascending: false });
 
   if (error) throw error;
@@ -133,6 +134,7 @@ export async function getPublicPropertyBySlug(
     .from("properties")
     .select("*, property_images(url, sort_order)")
     .eq("slug", slug)
+    .eq("published", true)
     .single();
 
   if (error) {
