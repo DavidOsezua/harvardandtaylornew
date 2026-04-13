@@ -3,10 +3,12 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import type { PropertyImage, PropertyInput, PropertyStatus } from "../types";
 import {
   createProperty,
+  deletePropertyDocument,
   deletePropertyImage,
   getProperty,
   listPropertyImages,
   updateProperty,
+  uploadPropertyDocument,
   uploadPropertyImage,
 } from "../api/properties";
 
@@ -58,6 +60,8 @@ interface FormState {
   price: string;
   description: string;
   features: string[];
+  youtubeUrl: string;
+  documentUrl: string | null;
 }
 
 const emptyForm: FormState = {
@@ -72,6 +76,8 @@ const emptyForm: FormState = {
   price: "",
   description: "",
   features: [],
+  youtubeUrl: "",
+  documentUrl: null,
 };
 
 const descriptionToArray = (text: string): string[] =>
@@ -92,6 +98,8 @@ const toPropertyInput = (form: FormState): PropertyInput => ({
   price: form.price.trim(),
   description: descriptionToArray(form.description),
   features: form.features,
+  youtubeUrl: form.youtubeUrl.trim() || null,
+  documentUrl: form.documentUrl,
 });
 
 const Label = ({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) => (
@@ -139,6 +147,10 @@ const AdminPropertyForm = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pendingPreviewsRef = useRef<string[]>([]);
 
+  const [pendingDocument, setPendingDocument] = useState<File | null>(null);
+  const documentInputRef = useRef<HTMLInputElement>(null);
+  const originalDocumentUrlRef = useRef<string | null>(null);
+
   // Track latest previews so the unmount cleanup can revoke them.
   useEffect(() => {
     pendingPreviewsRef.current = pendingPreviews;
@@ -179,7 +191,10 @@ const AdminPropertyForm = () => {
           price: property.price,
           description: property.description.join("\n\n"),
           features: property.features,
+          youtubeUrl: property.youtubeUrl ?? "",
+          documentUrl: property.documentUrl,
         });
+        originalDocumentUrlRef.current = property.documentUrl;
         setImages(imgs);
       })
       .catch((err: unknown) => {
@@ -257,6 +272,30 @@ const AdminPropertyForm = () => {
 
   const handleDragLeave = () => setDragOver(false);
 
+  const handleDocumentInput = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.type !== "application/pdf") {
+      alert("Please upload a PDF file.");
+      return;
+    }
+    setPendingDocument(file);
+    if (documentInputRef.current) documentInputRef.current.value = "";
+  };
+
+  const clearPendingDocument = () => {
+    setPendingDocument(null);
+    if (documentInputRef.current) documentInputRef.current.value = "";
+  };
+
+  const removeExistingDocument = () => {
+    const confirmed = window.confirm(
+      "Remove the current floor plan? It will be permanently deleted when you save.",
+    );
+    if (!confirmed) return;
+    update("documentUrl", null);
+  };
+
   const removeImage = async (image: PropertyImage) => {
     const confirmed = window.confirm("Remove this image?");
     if (!confirmed) return;
@@ -273,7 +312,8 @@ const AdminPropertyForm = () => {
     setSaving(true);
     setError(null);
     try {
-      const input = toPropertyInput(form);
+      // Step 1 — save the property row (without the new document URL yet; we don't have a propertyId for brand-new rows).
+      let input = toPropertyInput(form);
       let propertyId: string;
       if (isEdit && id) {
         await updateProperty(id, input);
@@ -283,7 +323,32 @@ const AdminPropertyForm = () => {
         propertyId = created.id;
       }
 
-      // Upload any staged images now that we have a property id.
+      // Step 2 — document: upload new file, or clean up removed file.
+      const originalDocUrl = originalDocumentUrlRef.current;
+      if (pendingDocument) {
+        setUploading(true);
+        const newUrl = await uploadPropertyDocument(propertyId, pendingDocument);
+        input = { ...input, documentUrl: newUrl };
+        await updateProperty(propertyId, input);
+        if (originalDocUrl && originalDocUrl !== newUrl) {
+          try {
+            await deletePropertyDocument(originalDocUrl);
+          } catch (cleanupErr) {
+            console.warn("Failed to delete previous document", cleanupErr);
+          }
+        }
+        originalDocumentUrlRef.current = newUrl;
+        setPendingDocument(null);
+      } else if (originalDocUrl && form.documentUrl === null) {
+        try {
+          await deletePropertyDocument(originalDocUrl);
+        } catch (cleanupErr) {
+          console.warn("Failed to delete removed document", cleanupErr);
+        }
+        originalDocumentUrlRef.current = null;
+      }
+
+      // Step 3 — images.
       if (pendingFiles.length > 0) {
         setUploading(true);
         for (const file of pendingFiles) {
@@ -292,9 +357,9 @@ const AdminPropertyForm = () => {
         pendingPreviews.forEach((url) => URL.revokeObjectURL(url));
         setPendingFiles([]);
         setPendingPreviews([]);
-        setUploading(false);
       }
 
+      setUploading(false);
       navigate("/admin/properties");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save property.");
@@ -441,6 +506,23 @@ const AdminPropertyForm = () => {
                   placeholder="10 X 10"
                   className={inputClass}
                 />
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="youtubeUrl">Virtual Tour (YouTube URL)</Label>
+                <input
+                  id="youtubeUrl"
+                  type="url"
+                  value={form.youtubeUrl}
+                  onChange={(e) => update("youtubeUrl", e.target.value)}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  className={inputClass}
+                />
+                <p
+                  className="text-[10px] text-tan/70 mt-1.5"
+                  style={{ fontFamily: "'Lato', sans-serif" }}
+                >
+                  Opens when the Virtual Tour button is clicked on the property page.
+                </p>
               </div>
             </div>
           </SectionCard>
@@ -616,6 +698,92 @@ const AdminPropertyForm = () => {
                     </button>
                   </div>
                 ))}
+              </div>
+            )}
+          </SectionCard>
+
+          {/* Floor plan document */}
+          <SectionCard title="Floor plan document">
+            <input
+              ref={documentInputRef}
+              type="file"
+              accept="application/pdf"
+              onChange={handleDocumentInput}
+              className="hidden"
+            />
+
+            {pendingDocument ? (
+              <div className="flex items-center justify-between gap-4 border border-tan/30 bg-cream/30 rounded-md px-4 py-3">
+                <div className="min-w-0">
+                  <p
+                    className="text-[12px] text-coffeeBrown truncate"
+                    style={{ fontFamily: "'Inter', sans-serif" }}
+                  >
+                    {pendingDocument.name}
+                  </p>
+                  <p
+                    className="text-[10px] text-coffeeBrown/70 mt-0.5"
+                    style={{ fontFamily: "'Lato', sans-serif" }}
+                  >
+                    Pending — uploads on save
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={clearPendingDocument}
+                  className="shrink-0 text-tan hover:text-red-600 transition-colors"
+                  aria-label="Remove pending document"
+                >
+                  <XIcon />
+                </button>
+              </div>
+            ) : form.documentUrl ? (
+              <div className="flex items-center justify-between gap-4 border border-tan/30 bg-cream/30 rounded-md px-4 py-3">
+                <a
+                  href={form.documentUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[12px] text-gold hover:underline truncate min-w-0"
+                  style={{ fontFamily: "'Inter', sans-serif" }}
+                >
+                  View current floor plan
+                </a>
+                <div className="shrink-0 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => documentInputRef.current?.click()}
+                    className="text-[10px] tracking-widest uppercase text-gold border border-gold/40 px-3 py-1.5 rounded-md hover:bg-gold hover:text-cream transition-colors"
+                    style={{ fontFamily: "'Lato', sans-serif" }}
+                  >
+                    Replace
+                  </button>
+                  <button
+                    type="button"
+                    onClick={removeExistingDocument}
+                    className="text-tan hover:text-red-600 transition-colors"
+                    aria-label="Remove current document"
+                  >
+                    <XIcon />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div
+                onClick={() => documentInputRef.current?.click()}
+                className="border-2 border-dashed border-tan/30 bg-cream/30 hover:border-gold/50 rounded-lg p-8 text-center cursor-pointer transition-colors"
+              >
+                <div className="flex flex-col items-center gap-2 text-tan">
+                  <UploadIcon />
+                  <p className="text-[12px]" style={{ fontFamily: "'Lato', sans-serif" }}>
+                    Click to upload a PDF
+                  </p>
+                  <p
+                    className="text-[10px] text-tan/60"
+                    style={{ fontFamily: "'Lato', sans-serif" }}
+                  >
+                    Downloaded when users click the Floor Plan button.
+                  </p>
+                </div>
               </div>
             )}
           </SectionCard>

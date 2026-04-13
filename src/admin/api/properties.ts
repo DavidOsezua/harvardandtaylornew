@@ -7,6 +7,7 @@ import type {
 } from "../types";
 
 const BUCKET = "property-images";
+const DOCUMENT_BUCKET = "property-documents";
 
 interface PropertyRow {
   id: string;
@@ -21,6 +22,8 @@ interface PropertyRow {
   price: string;
   description: string[];
   features: string[];
+  youtube_url: string | null;
+  document_url: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -47,6 +50,8 @@ const mapRow = (row: PropertyRow, images: string[] = []): AdminProperty => ({
   description: row.description ?? [],
   features: row.features ?? [],
   images,
+  youtubeUrl: row.youtube_url,
+  documentUrl: row.document_url,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
 });
@@ -72,6 +77,8 @@ const toRowInput = (input: PropertyInput) => ({
   price: input.price,
   description: input.description,
   features: input.features,
+  youtube_url: input.youtubeUrl,
+  document_url: input.documentUrl,
 });
 
 // ─── Properties CRUD ───
@@ -148,10 +155,24 @@ export async function deleteProperty(id: string): Promise<void> {
 
   if (imageRows && imageRows.length > 0) {
     const paths = imageRows
-      .map((row) => extractStoragePath(row.url))
+      .map((row) => extractStoragePath(row.url, BUCKET))
       .filter((p): p is string => Boolean(p));
     if (paths.length > 0) {
       await supabase.storage.from(BUCKET).remove(paths);
+    }
+  }
+
+  // Clean up document file if present
+  const { data: propertyRow } = await supabase
+    .from("properties")
+    .select("document_url")
+    .eq("id", id)
+    .single();
+
+  if (propertyRow?.document_url) {
+    const docPath = extractStoragePath(propertyRow.document_url, DOCUMENT_BUCKET);
+    if (docPath) {
+      await supabase.storage.from(DOCUMENT_BUCKET).remove([docPath]);
     }
   }
 
@@ -218,7 +239,7 @@ export async function deletePropertyImage(
   imageId: string,
   url: string
 ): Promise<void> {
-  const path = extractStoragePath(url);
+  const path = extractStoragePath(url, BUCKET);
   if (path) {
     await supabase.storage.from(BUCKET).remove([path]);
   }
@@ -229,12 +250,38 @@ export async function deletePropertyImage(
   if (error) throw error;
 }
 
-/**
- * Extracts the storage object path from a Supabase public URL.
- * e.g. https://xxx.supabase.co/storage/v1/object/public/property-images/abc/123.jpg
- *      -> "abc/123.jpg"
- */
-function extractStoragePath(publicUrl: string): string | null {
-  const match = publicUrl.match(/\/property-images\/(.+)$/);
-  return match ? match[1] : null;
+// ─── Document helpers ───
+
+export async function uploadPropertyDocument(
+  propertyId: string,
+  file: File
+): Promise<string> {
+  const ext = file.name.split(".").pop()?.toLowerCase() || "pdf";
+  const filename = `${crypto.randomUUID()}.${ext}`;
+  const path = `${propertyId}/${filename}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from(DOCUMENT_BUCKET)
+    .upload(path, file, { cacheControl: "3600", upsert: false });
+  if (uploadError) throw uploadError;
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from(DOCUMENT_BUCKET).getPublicUrl(path);
+
+  return publicUrl;
+}
+
+export async function deletePropertyDocument(url: string): Promise<void> {
+  const path = extractStoragePath(url, DOCUMENT_BUCKET);
+  if (path) {
+    await supabase.storage.from(DOCUMENT_BUCKET).remove([path]);
+  }
+}
+
+function extractStoragePath(publicUrl: string, bucket: string): string | null {
+  const marker = `/${bucket}/`;
+  const idx = publicUrl.indexOf(marker);
+  if (idx === -1) return null;
+  return publicUrl.slice(idx + marker.length);
 }

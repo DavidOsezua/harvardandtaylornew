@@ -19,6 +19,8 @@ export interface AdminProperty {
   description: string[];
   features: string[];
   images: string[];
+  youtubeUrl: string | null;
+  documentUrl: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -35,6 +37,8 @@ export interface PropertyInput {
   price: string;
   description: string[];
   features: string[];
+  youtubeUrl: string | null;
+  documentUrl: string | null;
 }
 
 export interface PropertyImage {

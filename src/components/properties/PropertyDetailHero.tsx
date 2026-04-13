@@ -12,6 +12,8 @@ interface PropertyDetail {
   slug: string;
   description?: string[];
   features?: string[];
+  youtubeUrl?: string | null;
+  documentUrl?: string | null;
 }
 
 const BedIcon = () => (
@@ -211,14 +213,60 @@ const PropertyDetailHero = ({ property }: PropertyDetailHeroProps) => {
 
               {/* Icon action buttons */}
               <div className="flex gap-2">
+                {property.youtubeUrl ? (
+                  <a
+                    href={property.youtubeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Virtual Tour"
+                    aria-label="Virtual Tour"
+                    className="flex items-center justify-center w-11 h-11 border border-black/15 text-black/55 hover:border-camel hover:text-camel transition-colors duration-200 rounded-sm"
+                  >
+                    <TourIcon />
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    disabled
+                    title="Virtual Tour unavailable"
+                    aria-label="Virtual Tour unavailable"
+                    className="flex items-center justify-center w-11 h-11 border border-black/10 text-black/25 rounded-sm cursor-not-allowed"
+                  >
+                    <TourIcon />
+                  </button>
+                )}
+
+                {property.documentUrl ? (
+                  <a
+                    href={property.documentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                    title="Floor Plan"
+                    aria-label="Download floor plan"
+                    className="flex items-center justify-center w-11 h-11 border border-black/15 text-black/55 hover:border-camel hover:text-camel transition-colors duration-200 rounded-sm"
+                  >
+                    <FloorplanIcon />
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    disabled
+                    title="Floor plan unavailable"
+                    aria-label="Floor plan unavailable"
+                    className="flex items-center justify-center w-11 h-11 border border-black/10 text-black/25 rounded-sm cursor-not-allowed"
+                  >
+                    <FloorplanIcon />
+                  </button>
+                )}
+
                 {[
-                  { icon: <TourIcon />, label: "Virtual Tour" },
-                  { icon: <FloorplanIcon />, label: "Floor Plan" },
                   { icon: <View3DIcon />, label: "3D View" },
                   { icon: <FeaturesIcon />, label: "Features" },
                 ].map(({ icon, label }) => (
                   <button
                     key={label}
+                    type="button"
                     title={label}
                     className="flex items-center justify-center w-11 h-11 border border-black/15 text-black/40 hover:border-camel hover:text-camel transition-colors duration-200 rounded-sm"
                   >

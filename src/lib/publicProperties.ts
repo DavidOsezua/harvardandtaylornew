@@ -15,6 +15,8 @@ interface PropertyRow {
   price: string;
   description: string[] | null;
   features: string[] | null;
+  youtube_url: string | null;
+  document_url: string | null;
 }
 
 interface PropertyImageRow {
@@ -99,6 +101,8 @@ const toPropertyDetail = (row: PropertyRowWithImages): PropertyDetail => {
     slug: row.slug,
     description: row.description ?? [],
     features: row.features ?? [],
+    youtubeUrl: row.youtube_url,
+    documentUrl: row.document_url,
   };
 };
 
