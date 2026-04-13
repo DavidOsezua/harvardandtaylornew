@@ -50,6 +50,12 @@ html {
   h6 {
     font-family: "Times New Roman", Times, serif;
   }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  a {
+    cursor: pointer;
+  }
 }
 
 .font-lato {
