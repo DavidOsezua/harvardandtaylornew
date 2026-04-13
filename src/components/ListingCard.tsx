@@ -68,10 +68,10 @@ const ListingCard = ({ listing }: { listing: Listing }) => {
   return (
     <Link
       to={`/properties/${listing.slug}`}
-      className="group flex flex-col bg-white   overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
+      className="group flex flex-col h-full bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
     >
       {/* Image */}
-      <div className="relative h-70 overflow-hidden">
+      <div className="relative h-70 shrink-0 overflow-hidden">
         <ProgressiveImage
           src={listing.image}
           alt={listing.address}
@@ -88,10 +88,10 @@ const ListingCard = ({ listing }: { listing: Listing }) => {
       </div>
 
       {/* Content */}
-      <div className="flex flex-col gap-2 px-4 py-4">
+      <div className="flex flex-col flex-1 gap-2 px-4 py-4">
         {/* Address */}
         <h3
-          className="text-coffeeBrown text-[27px] md:text-[30px] leading-snug"
+          className="text-coffeeBrown text-[27px] md:text-[30px] leading-snug line-clamp-2"
           style={{
             fontFamily: "'Times New Roman', Times, serif",
             fontWeight: 400,
@@ -123,7 +123,7 @@ const ListingCard = ({ listing }: { listing: Listing }) => {
 
         {/* Price */}
         <p
-          className="text-coffeeBrown text-[23px] md:text-[28px] font-light mt-1"
+          className="text-coffeeBrown text-[23px] md:text-[28px] font-light mt-auto pt-1"
           style={{ fontFamily: "'Times New Roman', Times, serif" }}
         >
           £{listing.price} pcm

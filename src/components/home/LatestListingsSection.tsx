@@ -68,7 +68,7 @@ const LatestListingsSection = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {listings.map((listing, i) => (
-              <FadeIn key={listing.id} delay={i * 120}>
+              <FadeIn key={listing.id} delay={i * 120} className="h-full">
                 <ListingCard listing={listing} />
               </FadeIn>
             ))}
