@@ -49,13 +49,13 @@ const AboutPage = () => {
         <div className="max-w-xl mx-auto flex flex-col items-center text-center gap-6">
 
           {/* Portrait */}
-          <FadeIn className="w-full max-w-125 overflow-hidden rounded-sm">
+          {/* <FadeIn className="w-full max-w-125 overflow-hidden rounded-sm">
             <img
               src="/images/team.webp"
               alt="The Principal – Managing Director"
               className="w-full h-auto object-cover"
             />
-          </FadeIn>
+          </FadeIn> */}
 
           {/* Name / Title */}
           <FadeIn delay={100} className="flex flex-col gap-1.5 mt-2">
